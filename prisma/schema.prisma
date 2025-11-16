@@ -1,0 +1,267 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String    // hashed
+  avatar        String?
+  role          Role      @default(STUDENT)
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  enrollments         Enrollment[]
+  payments            Payment[]
+  progress            Progress[]
+  exerciseSubmissions ExerciseSubmission[]
+  coursesCreated      Course[]               @relation("InstructorCourses")
+
+  @@index([email])
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+// ============================================
+// COURSES & CONTENT
+// ============================================
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  thumbnail   String?
+  price       Decimal  @default(0) @db.Decimal(10, 2)
+  isFree      Boolean  @default(true)
+  isPublished Boolean  @default(false)
+  level       Level    @default(BEGINNER)
+  language    String   @default("en")
+
+  instructorId String
+  instructor   User   @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  lessons     Lesson[]
+  documents   Document[]
+  enrollments Enrollment[]
+  categories  CourseCategory[]
+  exercises   Exercise[]
+
+  @@index([instructorId])
+  @@index([slug])
+  @@index([isPublished])
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL_LEVELS
+}
+
+model Category {
+  id      String           @id @default(cuid())
+  name    String           @unique
+  slug    String           @unique
+  courses CourseCategory[]
+
+  @@index([slug])
+}
+
+model CourseCategory {
+  courseId   String
+  categoryId String
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, categoryId])
+}
+
+model Lesson {
+  id          String  @id @default(cuid())
+  title       String
+  description String? @db.Text
+  videoUrl    String
+  duration    Int     // in seconds
+  order       Int     // for sorting lessons
+  isFree      Boolean @default(false) // preview lessons
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  progress Progress[]
+
+  @@index([courseId, order])
+}
+
+// ============================================
+// DOCUMENT MANAGEMENT (GED)
+// ============================================
+
+model Document {
+  id          String       @id @default(cuid())
+  title       String
+  description String?      @db.Text
+  fileUrl     String
+  fileType    String       // pdf, docx, etc.
+  fileSize    Int          // in bytes
+  type        DocumentType @default(RESOURCE)
+
+  courseId String?
+  course   Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+enum DocumentType {
+  RESOURCE
+  ATTACHMENT
+  HOMEWORK
+  CERTIFICATE
+}
+
+// ============================================
+// ENROLLMENT & PROGRESS
+// ============================================
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  userId      String
+  courseId    String
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model Progress {
+  id          String    @id @default(cuid())
+  userId      String
+  lessonId    String
+  isCompleted Boolean   @default(false)
+  watchedAt   DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+}
+
+// ============================================
+// PAYMENTS
+// ============================================
+
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  courseId        String
+  amount          Decimal       @db.Decimal(10, 2)
+  currency        String        @default("USD")
+  status          PaymentStatus @default(PENDING)
+  stripePaymentId String?       @unique
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([stripePaymentId])
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// ============================================
+// EXERCISES & PRACTICE
+// ============================================
+
+model Exercise {
+  id          String       @id @default(cuid())
+  title       String
+  description String       @db.Text
+  question    String       @db.Text
+  type        ExerciseType @default(TEXT)
+  order       Int
+  answer      String?      @db.Text // Correct answer for auto-grading
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  submissions ExerciseSubmission[]
+
+  @@index([courseId])
+}
+
+enum ExerciseType {
+  MULTIPLE_CHOICE
+  TEXT
+  CODE
+  FILE_UPLOAD
+}
+
+model ExerciseSubmission {
+  id         String   @id @default(cuid())
+  userId     String
+  exerciseId String
+  answer     String   @db.Text
+  isCorrect  Boolean?
+  feedback   String?  @db.Text
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, exerciseId])
+  @@index([userId])
+  @@index([exerciseId])
+}
