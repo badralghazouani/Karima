@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { ReviewList } from '@/components/reviews/review-list';
 import { formatPrice, formatDuration } from '@/lib/utils';
 
 interface Lesson {
@@ -286,6 +287,12 @@ export default function CourseDetailPage() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Reviews Section */}
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Student Reviews</h2>
+                <ReviewList courseId={course.id} isEnrolled={course.isEnrolled} />
+              </div>
             </div>
 
             {/* Sidebar */}

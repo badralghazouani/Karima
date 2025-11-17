@@ -31,6 +31,7 @@ model User {
   progress            Progress[]
   exerciseSubmissions ExerciseSubmission[]
   coursesCreated      Course[]               @relation("InstructorCourses")
+  reviews             Review[]
 
   @@index([email])
 }
@@ -69,6 +70,7 @@ model Course {
   enrollments Enrollment[]
   categories  CourseCategory[]
   exercises   Exercise[]
+  reviews     Review[]
 
   @@index([instructorId])
   @@index([slug])
@@ -188,6 +190,29 @@ model Progress {
 }
 
 // ============================================
+// REVIEWS & RATINGS
+// ============================================
+
+model Review {
+  id      String  @id @default(cuid())
+  rating  Int     // 1-5 stars
+  comment String? @db.Text
+
+  userId   String
+  courseId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+  @@index([rating])
+}
+
+// ============================================
 // PAYMENTS
 // ============================================
 
@@ -228,6 +253,7 @@ model Exercise {
   type        ExerciseType @default(TEXT)
   order       Int
   answer      String?      @db.Text // Correct answer for auto-grading
+  points      Int          @default(10) // Points awarded for correct answer
 
   courseId String
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -236,8 +262,23 @@ model Exercise {
   updatedAt DateTime @updatedAt
 
   submissions ExerciseSubmission[]
+  options     QuizOption[]
 
   @@index([courseId])
+}
+
+model QuizOption {
+  id        String  @id @default(cuid())
+  text      String
+  isCorrect Boolean @default(false)
+  order     Int
+
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([exerciseId])
 }
 
 enum ExerciseType {
@@ -253,6 +294,7 @@ model ExerciseSubmission {
   exerciseId String
   answer     String   @db.Text
   isCorrect  Boolean?
+  score      Int?     // Points earned
   feedback   String?  @db.Text
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)

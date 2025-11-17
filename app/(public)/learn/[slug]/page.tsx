@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ExerciseList } from '@/components/student/exercise-list';
 import { formatDuration } from '@/lib/utils';
 
 interface Lesson {
@@ -43,6 +44,7 @@ export default function CoursePlayerPage() {
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [sidebarView, setSidebarView] = useState<'lessons' | 'exercises'>('lessons');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -210,11 +212,11 @@ export default function CoursePlayerPage() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Lesson List */}
+        {/* Sidebar - Lessons & Exercises */}
         <div
           className={`${
             isSidebarOpen ? 'w-full lg:w-80' : 'hidden'
-          } border-r bg-white overflow-y-auto`}
+          } border-r bg-white overflow-y-auto flex flex-col`}
         >
           <div className="p-4 border-b">
             <h2 className="font-bold text-lg mb-2">{course.title}</h2>
@@ -223,42 +225,75 @@ export default function CoursePlayerPage() {
             </p>
           </div>
 
-          <div className="divide-y">
-            {course.lessons.map((lesson, index) => (
-              <button
-                key={lesson.id}
-                onClick={() => {
-                  setCurrentLesson(lesson);
-                  router.push(`/learn/${slug}?lesson=${lesson.id}`);
-                  setIsSidebarOpen(false);
-                }}
-                className={`w-full text-left p-4 hover:bg-accent transition-colors ${
-                  currentLesson?.id === lesson.id ? 'bg-accent' : ''
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1">
-                    {isLessonCompleted(lesson.id) ? (
-                      <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+          {/* Tabs */}
+          <div className="border-b flex">
+            <button
+              onClick={() => setSidebarView('lessons')}
+              className={`flex-1 py-3 px-4 text-sm font-medium border-b-2 transition-colors ${
+                sidebarView === 'lessons'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent hover:text-primary'
+              }`}
+            >
+              Lessons
+            </button>
+            <button
+              onClick={() => setSidebarView('exercises')}
+              className={`flex-1 py-3 px-4 text-sm font-medium border-b-2 transition-colors ${
+                sidebarView === 'exercises'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent hover:text-primary'
+              }`}
+            >
+              Exercises
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto">
+            {sidebarView === 'lessons' ? (
+              <div className="divide-y">
+                {course.lessons.map((lesson, index) => (
+                  <button
+                    key={lesson.id}
+                    onClick={() => {
+                      setCurrentLesson(lesson);
+                      router.push(`/learn/${slug}?lesson=${lesson.id}`);
+                      setIsSidebarOpen(false);
+                    }}
+                    className={`w-full text-left p-4 hover:bg-accent transition-colors ${
+                      currentLesson?.id === lesson.id ? 'bg-accent' : ''
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 mt-1">
+                        {isLessonCompleted(lesson.id) ? (
+                          <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        ) : (
+                          <div className="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                            <span className="text-xs text-gray-600">{index + 1}</span>
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div className="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                        <span className="text-xs text-gray-600">{index + 1}</span>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-sm mb-1 line-clamp-2">{lesson.title}</h4>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDuration(lesson.duration)}
+                        </p>
                       </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm mb-1 line-clamp-2">{lesson.title}</h4>
-                    <p className="text-xs text-muted-foreground">
-                      {formatDuration(lesson.duration)}
-                    </p>
-                  </div>
-                </div>
-              </button>
-            ))}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="p-4">
+                <ExerciseList courseId={course.id} />
+              </div>
+            )}
           </div>
         </div>
 

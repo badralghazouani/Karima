@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { ExerciseManager } from '@/components/instructor/exercise-manager';
 import { formatDuration } from '@/lib/utils';
 
 interface Lesson {
@@ -39,7 +40,7 @@ export default function EditCoursePage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'details' | 'curriculum' | 'settings'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'curriculum' | 'exercises' | 'settings'>('details');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -325,6 +326,16 @@ export default function EditCoursePage() {
               Curriculum ({course.lessons.length} lessons)
             </button>
             <button
+              onClick={() => setActiveTab('exercises')}
+              className={`pb-4 px-1 border-b-2 transition-colors ${
+                activeTab === 'exercises'
+                  ? 'border-primary text-primary font-medium'
+                  : 'border-transparent hover:text-primary'
+              }`}
+            >
+              Exercises & Quizzes
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
               className={`pb-4 px-1 border-b-2 transition-colors ${
                 activeTab === 'settings'
@@ -545,6 +556,11 @@ export default function EditCoursePage() {
               </Card>
             )}
           </div>
+        )}
+
+        {/* Exercises Tab */}
+        {activeTab === 'exercises' && (
+          <ExerciseManager courseId={courseId} />
         )}
 
         {/* Settings Tab */}
