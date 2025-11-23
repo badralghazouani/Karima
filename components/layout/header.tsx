@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 export function Header() {
   const { data: session } = useSession();
@@ -37,6 +38,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center space-x-4">
+          <LanguageSwitcher />
           {session?.user ? (
             <>
               <Link href="/dashboard/my-courses">
