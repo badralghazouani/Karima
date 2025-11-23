@@ -26,6 +26,14 @@ export function Header() {
               Teach
             </Link>
           )}
+          {session?.user && (session.user as any).role === 'ADMIN' && (
+            <Link
+              href="/admin/dashboard"
+              className="hover:text-primary transition"
+            >
+              Admin Panel
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center space-x-4">

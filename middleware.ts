@@ -7,8 +7,13 @@ export default withAuth(
     const path = req.nextUrl.pathname;
 
     // Redirect to login if trying to access protected routes without auth
-    if (!token && (path.startsWith('/dashboard') || path.startsWith('/instructor'))) {
+    if (!token && (path.startsWith('/dashboard') || path.startsWith('/instructor') || path.startsWith('/admin'))) {
       return NextResponse.redirect(new URL('/auth/login', req.url));
+    }
+
+    // Only allow admin role to access admin panel
+    if (path.startsWith('/admin') && token?.role !== 'ADMIN') {
+      return NextResponse.redirect(new URL('/', req.url));
     }
 
     // Redirect instructors trying to access student dashboard
@@ -25,9 +30,9 @@ export default withAuth(
       return NextResponse.redirect(new URL('/dashboard/my-courses', req.url));
     }
 
-    // Redirect admin to admin panel
+    // Redirect admin to admin panel by default
     if (token?.role === 'ADMIN' && (path === '/dashboard' || path === '/instructor')) {
-      return NextResponse.redirect(new URL('/admin', req.url));
+      return NextResponse.redirect(new URL('/admin/dashboard', req.url));
     }
 
     return NextResponse.next();
