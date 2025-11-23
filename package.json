@@ -8,44 +8,44 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "seed": "npm run db:seed"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.654.0",
+    "@hookform/resolvers": "^3.9.0",
+    "@prisma/client": "^5.18.0",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.5.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
     "next": "^14.2.0",
+    "next-auth": "^4.24.7",
+    "nodemailer": "^7.0.10",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "@prisma/client": "^5.18.0",
-    "next-auth": "^4.24.7",
-    "bcryptjs": "^2.4.3",
-    "zod": "^3.23.8",
-    "react-hook-form": "^7.53.0",
-    "@hookform/resolvers": "^3.9.0",
-    "stripe": "^16.8.0",
-    "@aws-sdk/client-s3": "^3.654.0",
-    "cloudinary": "^2.5.0",
-    "nodemailer": "^6.9.14",
     "react-dropzone": "^14.2.3",
-    "zustand": "^4.5.5",
-    "date-fns": "^3.6.0",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.2"
+    "react-hook-form": "^7.53.0",
+    "stripe": "^16.8.0",
+    "tailwind-merge": "^2.5.2",
+    "zod": "^3.23.8",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/nodemailer": "^6.4.15",
-    "typescript": "^5.5.0",
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.0",
     "autoprefixer": "^10.4.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.0.3",
+    "postcss": "^8.4.0",
     "prisma": "^5.18.0",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.0",
-    "ts-node": "^10.9.2"
+    "tailwindcss": "^3.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0"
   }
 }
