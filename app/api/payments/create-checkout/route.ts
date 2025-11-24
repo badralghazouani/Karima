@@ -37,12 +37,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    if (course.isFree) {
-      return NextResponse.json(
-        { error: 'This course is free' },
-        { status: 400 }
-      );
-    }
+    const isFreeCourse = course.isFree || Number(course.price) === 0;
 
     // Check if already enrolled
     const existingEnrollment = await prisma.enrollment.findUnique({
@@ -56,9 +51,25 @@ export async function POST(req: NextRequest) {
 
     if (existingEnrollment) {
       return NextResponse.json(
-        { error: 'Already enrolled in this course' },
+        { error: 'Already enrolled in this course', redirect: `/learn/${course.slug}` },
         { status: 409 }
       );
+    }
+
+    // If the course is free, enroll immediately without Stripe
+    if (isFreeCourse) {
+      await prisma.enrollment.create({
+        data: {
+          userId: (session.user as any).id,
+          courseId: course.id,
+        },
+      });
+
+      return NextResponse.json({
+        enrolled: true,
+        free: true,
+        redirect: `/learn/${course.slug}`,
+      });
     }
 
     // Check if payment already exists

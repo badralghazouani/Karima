@@ -113,7 +113,9 @@ export function CourseCard({ course }: CourseCardProps) {
       </CardContent>
 
       <CardFooter className="flex items-center justify-between pt-4 border-t">
-        <div className="text-xl font-bold">{formatPrice(course.price)}</div>
+        <div className="text-xl font-bold">
+          {course.isFree || Number(course.price) === 0 ? 'Free' : formatPrice(course.price)}
+        </div>
         <Link href={`/courses/${course.slug}`}>
           <Button>View Course</Button>
         </Link>

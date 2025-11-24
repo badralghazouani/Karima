@@ -145,6 +145,7 @@ export default function CourseDetailPage() {
   }
 
   const totalDuration = course.lessons.reduce((acc, lesson) => acc + lesson.duration, 0);
+  const isFreeCourse = course.isFree || Number(course.price) === 0;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -301,9 +302,9 @@ export default function CourseDetailPage() {
                 <CardContent className="pt-6">
                   <div className="text-center mb-6">
                     <div className="text-3xl font-bold mb-2">
-                      {formatPrice(course.price)}
+                      {isFreeCourse ? 'Free' : formatPrice(course.price)}
                     </div>
-                    {!course.isFree && (
+                    {!isFreeCourse && (
                       <p className="text-sm text-muted-foreground">One-time payment</p>
                     )}
                   </div>
@@ -314,7 +315,7 @@ export default function CourseDetailPage() {
                         Continue Learning
                       </Button>
                     </Link>
-                  ) : course.isFree ? (
+                  ) : isFreeCourse ? (
                     <Button
                       className="w-full"
                       size="lg"

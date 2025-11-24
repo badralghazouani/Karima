@@ -16,6 +16,7 @@ interface Course {
   slug: string;
   description: string;
   price: string;
+  isFree: boolean;
   instructor: {
     name: string;
   };
@@ -47,8 +48,24 @@ export default function CheckoutPage() {
       const data = await response.json();
 
       if (response.ok) {
-        if (data.isFree) {
-          router.push(`/courses/${data.slug}`);
+        const isFreeCourse = data.isFree || Number(data.price) === 0;
+
+        if (isFreeCourse) {
+          const enrollResponse = await fetch('/api/enrollments', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ courseId: data.id }),
+          });
+
+          if (enrollResponse.ok || enrollResponse.status === 409) {
+            router.push(`/learn/${data.slug}`);
+            return;
+          }
+
+          const enrollError = await enrollResponse.json();
+          setError(enrollError.error || 'Failed to enroll in free course');
           return;
         }
         if (data.isEnrolled) {
@@ -84,13 +101,32 @@ export default function CheckoutPage() {
 
       const data = await response.json();
 
-      if (response.ok && data.url) {
-        // Redirect to Stripe checkout
-        window.location.href = data.url;
-      } else {
-        setError(data.error || 'Failed to create checkout session');
-        setIsProcessing(false);
+      if (response.ok) {
+        if (data.free && data.redirect) {
+          router.push(data.redirect);
+          return;
+        }
+
+        if (data.url) {
+          window.location.href = data.url;
+          return;
+        }
       }
+
+      if (response.status === 409) {
+        if (data.redirect) {
+          router.push(data.redirect);
+          return;
+        }
+
+        if (course?.slug) {
+          router.push(`/learn/${course.slug}`);
+          return;
+        }
+      }
+
+      setError(data.error || 'Failed to create checkout session');
+      setIsProcessing(false);
     } catch (error) {
       console.error('Checkout error:', error);
       setError('An error occurred. Please try again.');
