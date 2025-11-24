@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ExerciseList } from '@/components/student/exercise-list';
+import { VideoPlayer } from '@/components/video-player';
 import { formatDuration } from '@/lib/utils';
 
 interface Lesson {
@@ -304,15 +305,13 @@ export default function CoursePlayerPage() {
             <>
               {/* Video */}
               <div className="bg-black flex-1 flex items-center justify-center">
-                <video
+                <VideoPlayer
                   key={currentLesson.id}
-                  className="w-full h-full"
-                  controls
+                  src={currentLesson.videoUrl}
+                  title={currentLesson.title}
                   onEnded={() => handleLessonComplete(currentLesson.id)}
-                >
-                  <source src={currentLesson.videoUrl} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+                  autoPlay={false}
+                />
               </div>
 
               {/* Lesson Info & Controls */}
