@@ -55,6 +55,7 @@ model Course {
   price       Decimal  @default(0) @db.Decimal(10, 2)
   isFree      Boolean  @default(true)
   isPublished Boolean  @default(false)
+  isArchived  Boolean  @default(false)
   level       Level    @default(BEGINNER)
   language    String   @default("en")
 
@@ -75,6 +76,7 @@ model Course {
   @@index([instructorId])
   @@index([slug])
   @@index([isPublished])
+  @@index([isArchived])
 }
 
 enum Level {

@@ -25,6 +25,7 @@ interface Course {
   description: string;
   lessons: Lesson[];
   isEnrolled: boolean;
+  canAccess: boolean;
 }
 
 interface ProgressRecord {
@@ -82,7 +83,7 @@ export default function CoursePlayerPage() {
         const detailResponse = await fetch(`/api/courses/${foundCourse.id}`);
         const courseData = await detailResponse.json();
 
-        if (!courseData.isEnrolled) {
+        if (!courseData.canAccess) {
           router.push(`/courses/${slug}`);
           return;
         }

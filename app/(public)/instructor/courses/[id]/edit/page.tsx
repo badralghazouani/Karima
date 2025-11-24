@@ -29,6 +29,7 @@ interface Course {
   level: string;
   language: string;
   isPublished: boolean;
+  isArchived: boolean;
   lessons: Lesson[];
 }
 
@@ -223,6 +224,37 @@ export default function EditCoursePage() {
       }
     } catch (error) {
       console.error('Failed to toggle publish:', error);
+      alert('An error occurred');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleArchiveToggle = async () => {
+    const action = course?.isArchived ? 'unarchive' : 'archive';
+    if (!confirm(`Are you sure you want to ${action} this course?`)) {
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/courses/${courseId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          isArchived: !course?.isArchived,
+        }),
+      });
+
+      if (response.ok) {
+        fetchCourse();
+      } else {
+        alert('Failed to update archive status');
+      }
+    } catch (error) {
+      console.error('Failed to toggle archive:', error);
       alert('An error occurred');
     } finally {
       setIsSaving(false);
@@ -580,6 +612,22 @@ export default function EditCoursePage() {
                 </p>
                 <Button onClick={handlePublishToggle} disabled={isSaving}>
                   {course.isPublished ? 'Unpublish Course' : 'Publish Course'}
+                </Button>
+              </div>
+
+              <div className="p-4 border border-orange-300 rounded-lg">
+                <h4 className="font-medium mb-2">Archive Status</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {course.isArchived
+                    ? 'This course is archived and hidden from your active courses list.'
+                    : 'Archive this course to remove it from your active courses list without deleting it.'}
+                </p>
+                <Button
+                  onClick={handleArchiveToggle}
+                  disabled={isSaving}
+                  variant={course.isArchived ? 'default' : 'outline'}
+                >
+                  {course.isArchived ? 'Unarchive Course' : 'Archive Course'}
                 </Button>
               </div>
 

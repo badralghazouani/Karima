@@ -16,6 +16,7 @@ interface Course {
   description: string;
   price: string;
   isPublished: boolean;
+  isArchived: boolean;
   createdAt: string;
   _count: {
     enrollments: number;
@@ -28,6 +29,7 @@ export default function InstructorCoursesPage() {
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showArchived, setShowArchived] = useState(false);
 
   useEffect(() => {
     if (session?.user) {
@@ -69,6 +71,38 @@ export default function InstructorCoursesPage() {
     }
   };
 
+  const handleArchive = async (courseId: string, isCurrentlyArchived: boolean) => {
+    const action = isCurrentlyArchived ? 'unarchive' : 'archive';
+    if (!confirm(`Are you sure you want to ${action} this course?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/courses/${courseId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          isArchived: !isCurrentlyArchived,
+        }),
+      });
+
+      if (response.ok) {
+        // Refresh courses list
+        fetchCourses();
+      }
+    } catch (error) {
+      console.error('Failed to archive/unarchive course:', error);
+      alert('Failed to update course');
+    }
+  };
+
+  // Filter courses based on archived status
+  const filteredCourses = courses.filter((course) =>
+    showArchived ? course.isArchived : !course.isArchived
+  );
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -101,11 +135,27 @@ export default function InstructorCoursesPage() {
           </Link>
         </div>
 
+        {/* Filter buttons */}
+        <div className="mb-6 flex gap-2">
+          <Button
+            variant={!showArchived ? 'default' : 'outline'}
+            onClick={() => setShowArchived(false)}
+          >
+            Active Courses ({courses.filter((c) => !c.isArchived).length})
+          </Button>
+          <Button
+            variant={showArchived ? 'default' : 'outline'}
+            onClick={() => setShowArchived(true)}
+          >
+            Archived Courses ({courses.filter((c) => c.isArchived).length})
+          </Button>
+        </div>
+
         {isLoading ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Loading courses...</p>
           </div>
-        ) : courses.length === 0 ? (
+        ) : filteredCourses.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center py-12">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -134,7 +184,7 @@ export default function InstructorCoursesPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
+            {filteredCourses.map((course) => (
               <Card key={course.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -144,7 +194,7 @@ export default function InstructorCoursesPage() {
                         {course.description}
                       </CardDescription>
                     </div>
-                    <div className="ml-2">
+                    <div className="ml-2 flex flex-col gap-1">
                       {course.isPublished ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           Published
@@ -152,6 +202,11 @@ export default function InstructorCoursesPage() {
                       ) : (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                           Draft
+                        </span>
+                      )}
+                      {course.isArchived && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                          Archived
                         </span>
                       )}
                     </div>
@@ -172,16 +227,26 @@ export default function InstructorCoursesPage() {
                       <span className="font-medium">{course._count?.lessons || 0}</span>
                     </div>
 
-                    <div className="pt-4 flex gap-2">
-                      <Link href={`/instructor/courses/${course.id}/edit`} className="flex-1">
-                        <Button variant="outline" className="w-full" size="sm">
-                          Edit
+                    <div className="pt-4 flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <Link href={`/instructor/courses/${course.id}/edit`} className="flex-1">
+                          <Button variant="outline" className="w-full" size="sm">
+                            Edit
+                          </Button>
+                        </Link>
+                        <Button
+                          variant={course.isArchived ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleArchive(course.id, course.isArchived)}
+                        >
+                          {course.isArchived ? 'Unarchive' : 'Archive'}
                         </Button>
-                      </Link>
+                      </div>
                       <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDelete(course.id)}
+                        className="w-full"
                       >
                         Delete
                       </Button>
