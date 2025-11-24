@@ -182,12 +182,24 @@ export function EnrolledCourses() {
                       </div>
                     )}
 
-                    {/* Action Button */}
-                    <Link href={`/learn/${enrollment.course.slug}`} className="block">
-                      <Button className="w-full" variant={enrollment.completedAt ? 'outline' : 'default'}>
-                        {enrollment.completedAt ? 'Review Course' : 'Continue Learning'}
-                      </Button>
-                    </Link>
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <Link href={`/watch/${enrollment.course.slug}`} className="flex-1">
+                        <Button className="w-full" variant={enrollment.completedAt ? 'outline' : 'default'}>
+                          <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                          Watch
+                        </Button>
+                      </Link>
+                      <Link href={`/learn/${enrollment.course.slug}`}>
+                        <Button variant="outline" size="icon" title="Learning Mode">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
