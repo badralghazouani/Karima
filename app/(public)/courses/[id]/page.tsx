@@ -23,7 +23,6 @@ interface Lesson {
 interface Course {
   id: string;
   title: string;
-  slug: string;
   description: string;
   thumbnail: string | null;
   price: string;
@@ -47,7 +46,7 @@ export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { data: session } = useSession();
-  const slug = params.slug as string;
+  const courseId = params.id as string;
 
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,21 +54,13 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     fetchCourse();
-  }, [slug]);
+  }, [courseId]);
 
   const fetchCourse = async () => {
     try {
-      // Fetch course by slug (we'll need to add this endpoint or search)
-      const response = await fetch(`/api/courses?search=${slug}`);
-      const courses = await response.json();
-
-      // Find course by slug
-      const foundCourse = courses.find((c: Course) => c.slug === slug);
-
-      if (foundCourse) {
-        // Fetch full details
-        const detailResponse = await fetch(`/api/courses/${foundCourse.id}`);
-        const courseData = await detailResponse.json();
+      const detailResponse = await fetch(`/api/courses/${courseId}`);
+      const courseData = await detailResponse.json();
+      if (detailResponse.ok) {
         setCourse(courseData);
       }
     } catch (error) {
@@ -99,7 +90,7 @@ export default function CourseDetailPage() {
 
       if (response.ok) {
         // Redirect to course player
-        router.push(`/learn/${course?.slug}`);
+        router.push(`/learn/${course?.id}`);
       } else {
         const data = await response.json();
         alert(data.error || 'Failed to enroll');
@@ -310,7 +301,7 @@ export default function CourseDetailPage() {
                   </div>
 
                   {course.isEnrolled ? (
-                    <Link href={`/learn/${course.slug}`}>
+                    <Link href={`/learn/${course.id}`}>
                       <Button className="w-full" size="lg">
                         Continue Learning
                       </Button>

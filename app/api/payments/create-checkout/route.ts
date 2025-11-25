@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     if (existingEnrollment) {
       return NextResponse.json(
-        { error: 'Already enrolled in this course', redirect: `/learn/${course.slug}` },
+        { error: 'Already enrolled in this course', redirect: `/learn/${course.id}` },
         { status: 409 }
       );
     }
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         enrolled: true,
         free: true,
-        redirect: `/learn/${course.slug}`,
+        redirect: `/learn/${course.id}`,
       });
     }
 
@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
         courseTitle: course.title,
       },
       success_url: `${baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/courses/${course.slug}?canceled=true`,
+      cancel_url: `${baseUrl}/courses/${course.id}?canceled=true`,
     });
 
     // Create pending payment record

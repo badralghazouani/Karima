@@ -13,7 +13,6 @@ import { formatPrice } from '@/lib/utils';
 interface Course {
   id: string;
   title: string;
-  slug: string;
   description: string;
   price: string;
   isFree: boolean;
@@ -60,7 +59,7 @@ export default function CheckoutPage() {
           });
 
           if (enrollResponse.ok || enrollResponse.status === 409) {
-            router.push(`/learn/${data.slug}`);
+            router.push(`/learn/${data.id}`);
             return;
           }
 
@@ -69,7 +68,7 @@ export default function CheckoutPage() {
           return;
         }
         if (data.isEnrolled) {
-          router.push(`/learn/${data.slug}`);
+          router.push(`/learn/${data.id}`);
           return;
         }
         setCourse(data);
@@ -119,8 +118,8 @@ export default function CheckoutPage() {
           return;
         }
 
-        if (course?.slug) {
-          router.push(`/learn/${course.slug}`);
+        if (course?.id) {
+          router.push(`/learn/${course.id}`);
           return;
         }
       }

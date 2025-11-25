@@ -27,7 +27,6 @@ interface Instructor {
 interface Course {
   id: string;
   title: string;
-  slug: string;
   description: string;
   instructor: Instructor;
   lessons: Lesson[];
@@ -48,7 +47,7 @@ export default function WatchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { data: session, status } = useSession();
-  const slug = params.slug as string;
+  const courseId = params.id as string;
 
   const [course, setCourse] = useState<Course | null>(null);
   const [progress, setProgress] = useState<ProgressRecord[]>([]);
@@ -62,7 +61,7 @@ export default function WatchPage() {
     } else if (status === 'authenticated') {
       fetchCourse();
     }
-  }, [status, slug]);
+  }, [status, courseId]);
 
   useEffect(() => {
     if (course && course.lessons.length > 0) {
@@ -82,28 +81,25 @@ export default function WatchPage() {
 
   const fetchCourse = async () => {
     try {
-      // Fetch course by slug
-      const response = await fetch(`/api/courses?search=${slug}`);
-      const courses = await response.json();
-      const foundCourse = courses.find((c: Course) => c.slug === slug);
+      const detailResponse = await fetch(`/api/courses/${courseId}`);
+      const courseData = await detailResponse.json();
 
-      if (foundCourse) {
-        // Fetch full details
-        const detailResponse = await fetch(`/api/courses/${foundCourse.id}`);
-        const courseData = await detailResponse.json();
-
-        if (!courseData.canAccess) {
-          router.push(`/courses/${slug}`);
-          return;
-        }
-
-        setCourse(courseData);
-
-        // Fetch progress
-        const progressResponse = await fetch(`/api/progress?courseId=${courseData.id}`);
-        const progressData = await progressResponse.json();
-        setProgress(progressData);
+      if (!detailResponse.ok) {
+        setCourse(null);
+        return;
       }
+
+      if (!courseData.canAccess) {
+        router.push(`/courses/${courseId}`);
+        return;
+      }
+
+      setCourse(courseData);
+
+      // Fetch progress
+      const progressResponse = await fetch(`/api/progress?courseId=${courseData.id}`);
+      const progressData = await progressResponse.json();
+      setProgress(progressData);
     } catch (error) {
       console.error('Failed to fetch course:', error);
     } finally {
@@ -144,7 +140,7 @@ export default function WatchPage() {
     if (currentIndex < course.lessons.length - 1) {
       const nextLesson = course.lessons[currentIndex + 1];
       setCurrentLesson(nextLesson);
-      router.push(`/watch/${slug}?lesson=${nextLesson.id}`);
+      router.push(`/watch/${course.id}?lesson=${nextLesson.id}`);
     }
   };
 
@@ -208,7 +204,7 @@ export default function WatchPage() {
               <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
                 <div className="flex items-center gap-4">
                   <Link
-                    href={`/courses/${course.slug}`}
+                    href={`/courses/${course.id}`}
                     className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400"
                   >
                     ← Back to Course
@@ -282,7 +278,7 @@ export default function WatchPage() {
                     if (currentIndex > 0) {
                       const prevLesson = course.lessons[currentIndex - 1];
                       setCurrentLesson(prevLesson);
-                      router.push(`/watch/${slug}?lesson=${prevLesson.id}`);
+      router.push(`/watch/${course.id}?lesson=${prevLesson.id}`);
                     }
                   }}
                   disabled={currentIndex === 0}
@@ -327,7 +323,7 @@ export default function WatchPage() {
                       key={lesson.id}
                       onClick={() => {
                         setCurrentLesson(lesson);
-                        router.push(`/watch/${slug}?lesson=${lesson.id}`);
+                        router.push(`/watch/${course.id}?lesson=${lesson.id}`);
                       }}
                       className={`w-full text-left p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
                         currentLesson.id === lesson.id

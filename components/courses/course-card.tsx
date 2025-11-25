@@ -7,7 +7,6 @@ interface CourseCardProps {
   course: {
     id: string;
     title: string;
-    slug: string;
     description: string;
     thumbnail: string | null;
     price: string;
@@ -116,7 +115,7 @@ export function CourseCard({ course }: CourseCardProps) {
         <div className="text-xl font-bold">
           {course.isFree || Number(course.price) === 0 ? 'Free' : formatPrice(course.price)}
         </div>
-        <Link href={`/courses/${course.slug}`}>
+        <Link href={`/courses/${course.id}`}>
           <Button>View Course</Button>
         </Link>
       </CardFooter>

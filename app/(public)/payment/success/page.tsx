@@ -141,7 +141,7 @@ export default function PaymentSuccessPage() {
 
               <div className="pt-4 border-t space-y-3">
                 {course && (
-                  <Link href={`/learn/${course.slug}`}>
+                  <Link href={`/learn/${course.id}`}>
                     <Button className="w-full" size="lg">
                       Start Learning Now
                     </Button>
