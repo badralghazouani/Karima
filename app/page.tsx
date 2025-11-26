@@ -1,9 +1,14 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function HomePage() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -13,19 +18,18 @@ export default function HomePage() {
         <section className="bg-gradient-to-r from-primary/10 to-primary/5 py-20">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-5xl font-bold mb-6">
-              Learn Without Limits
+              {t('home.heroTitle')}
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Start, switch, or advance your career with thousands of courses,
-              certificates, and degrees from world-class instructors.
+              {t('home.heroSubtitle')}
             </p>
             <div className="flex gap-4 justify-center">
               <Link href="/courses">
-                <Button size="lg">Explore Courses</Button>
+                <Button size="lg">{t('home.exploreCourses')}</Button>
               </Link>
               <Link href="/auth/signup">
                 <Button size="lg" variant="outline">
-                  Get Started Free
+                  {t('home.getStarted')}
                 </Button>
               </Link>
             </div>
@@ -36,7 +40,7 @@ export default function HomePage() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">
-              Why Choose Karima?
+              {t('home.whyChoose')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center p-6">
@@ -56,10 +60,10 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold mb-2">
-                  Expert Instructors
+                  {t('home.expertInstructorsTitle')}
                 </h3>
                 <p className="text-muted-foreground">
-                  Learn from industry professionals and subject matter experts
+                  {t('home.expertInstructorsDesc')}
                 </p>
               </div>
 
@@ -79,9 +83,11 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Track Progress</h3>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t('home.trackProgressTitle')}
+                </h3>
                 <p className="text-muted-foreground">
-                  Monitor your learning journey with detailed progress tracking
+                  {t('home.trackProgressDesc')}
                 </p>
               </div>
 
@@ -101,9 +107,11 @@ export default function HomePage() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Learn Anytime</h3>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t('home.learnAnytimeTitle')}
+                </h3>
                 <p className="text-muted-foreground">
-                  Access courses on your schedule, from anywhere in the world
+                  {t('home.learnAnytimeDesc')}
                 </p>
               </div>
             </div>
@@ -114,14 +122,14 @@ export default function HomePage() {
         <section className="bg-primary text-primary-foreground py-16">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-4">
-              Ready to Start Learning?
+              {t('home.ctaTitle')}
             </h2>
             <p className="text-lg mb-8 opacity-90">
-              Join thousands of students already learning on Karima
+              {t('home.ctaSubtitle')}
             </p>
             <Link href="/auth/signup">
               <Button size="lg" variant="secondary">
-                Create Free Account
+                {t('home.ctaButton')}
               </Button>
             </Link>
           </div>

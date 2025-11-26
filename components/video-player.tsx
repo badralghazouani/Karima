@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import type Hls from 'hls.js';
 
 interface VideoPlayerProps {
   src: string;
@@ -23,7 +23,110 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
   const [playbackRate, setPlaybackRate] = useState(1);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
+  const [isReady, setIsReady] = useState(false);
+
+  const getYouTubeId = (url: string) => {
+    try {
+      const parsed = new URL(url);
+      if (parsed.hostname.includes('youtu.be')) {
+        return parsed.pathname.split('/')[1];
+      }
+      if (parsed.searchParams.get('v')) {
+        return parsed.searchParams.get('v');
+      }
+      if (parsed.pathname.startsWith('/embed/')) {
+        return parsed.pathname.replace('/embed/', '');
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const youtubeId = getYouTubeId(src);
+
+  if (youtubeId) {
+    return (
+      <div className="relative w-full h-full bg-black">
+        <div className="relative w-full h-full aspect-video">
+          <iframe
+            title={title}
+            src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1&autoplay=${autoPlay ? 1 : 0}`}
+            className="absolute inset-0 w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Attach source with HLS support when needed
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !src) return;
+
+    let hls: Hls | null = null;
+    setHasError(false);
+    setIsReady(false);
+
+    const setupPlayer = async () => {
+      const isHlsSource = src.includes('.m3u8');
+
+      // Native HLS support (Safari, some browsers)
+      if (isHlsSource && video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = src;
+        video.load();
+        if (autoPlay) {
+          video.play().catch(() => {
+            setIsPlaying(false);
+          });
+        }
+        return;
+      }
+
+      if (isHlsSource) {
+        const HlsModule = await import('hls.js');
+        if (HlsModule.default.isSupported()) {
+          hls = new HlsModule.default();
+          hls.loadSource(src);
+          hls.attachMedia(video);
+          hls.on(HlsModule.default.Events.MANIFEST_PARSED, () => {
+            setIsReady(true);
+            if (autoPlay) {
+              video.play().catch(() => setIsPlaying(false));
+            }
+          });
+          hls.on(HlsModule.default.Events.ERROR, (_, data) => {
+            if (data?.fatal) {
+              setHasError(true);
+            }
+          });
+          return;
+        }
+      }
+
+      // Fallback to normal source
+      video.src = src;
+      video.load();
+      if (autoPlay) {
+        video.play().catch(() => setIsPlaying(false));
+      }
+    };
+
+    setupPlayer().catch((err) => {
+      console.error('Error setting up video player', err);
+      setHasError(true);
+    });
+
+    return () => {
+      if (hls) {
+        hls.destroy();
+      }
+    };
+  }, [src]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -41,6 +144,12 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
       setIsPlaying(false);
       if (onEnded) onEnded();
     };
+    const handleError = () => {
+      setHasError(true);
+    };
+    const handleCanPlay = () => {
+      setIsReady(true);
+    };
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
@@ -48,6 +157,8 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('ended', handleEnded);
+    video.addEventListener('error', handleError);
+    video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
 
@@ -55,6 +166,8 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('error', handleError);
+      video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
     };
@@ -188,12 +301,38 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
     }
     if (isPlaying) {
       controlsTimeoutRef.current = setTimeout(() => {
-        setShowControls(false);
+    setShowControls(false);
       }, 3000);
     }
   };
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  if (hasError) {
+    return (
+      <div className="relative w-full h-full bg-black flex items-center justify-center text-white">
+        <div className="text-center space-y-3 px-4">
+          <p className="text-lg font-semibold">Unable to load video</p>
+          <p className="text-sm text-white/70">Check the video URL or try again later.</p>
+          <button
+            onClick={() => {
+              setHasError(false);
+              const video = videoRef.current;
+              if (video) {
+                video.load();
+                video.play().catch(() => {
+                  setHasError(true);
+                });
+              }
+            }}
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded text-sm"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -201,12 +340,31 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
       onMouseMove={handleMouseMove}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
+      {!isReady && !hasError && (
+        <div className="absolute inset-0 flex items-center justify-center text-white bg-black/50 z-10">
+          <div className="flex items-center gap-3 text-sm">
+            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
+            </svg>
+            <span>Loading video...</span>
+          </div>
+        </div>
+      )}
+
       <video
         ref={videoRef}
         className="w-full h-full"
         src={src}
         autoPlay={autoPlay}
+        preload="metadata"
+        playsInline
         onClick={togglePlayPause}
+        muted={autoPlay}
       >
         Your browser does not support the video tag.
       </video>

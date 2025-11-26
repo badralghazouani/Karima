@@ -31,6 +31,22 @@
     "profile": "Profile",
     "dashboard": "Dashboard"
   },
+  "home": {
+    "heroTitle": "Learn Without Limits",
+    "heroSubtitle": "Start, switch, or advance your career with thousands of courses, certificates, and degrees from world-class instructors.",
+    "exploreCourses": "Explore Courses",
+    "getStarted": "Get Started Free",
+    "whyChoose": "Why Choose Karima?",
+    "expertInstructorsTitle": "Expert Instructors",
+    "expertInstructorsDesc": "Learn from industry professionals and subject matter experts",
+    "trackProgressTitle": "Track Progress",
+    "trackProgressDesc": "Monitor your learning journey with detailed progress tracking",
+    "learnAnytimeTitle": "Learn Anytime",
+    "learnAnytimeDesc": "Access courses on your schedule, from anywhere in the world",
+    "ctaTitle": "Ready to Start Learning?",
+    "ctaSubtitle": "Join thousands of students already learning on Karima",
+    "ctaButton": "Create Free Account"
+  },
   "auth": {
     "signIn": "Sign in to your account",
     "signUp": "Create a new account",

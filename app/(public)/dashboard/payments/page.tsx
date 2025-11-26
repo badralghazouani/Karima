@@ -18,7 +18,6 @@ interface Payment {
   course: {
     id: string;
     title: string;
-    slug: string;
     instructor: {
       name: string;
     };
@@ -174,18 +173,18 @@ export default function PaymentHistoryPage() {
                         <div className="font-bold text-lg">
                           {formatPrice(payment.amount)}
                         </div>
-                        <div className="text-xs text-muted-foreground uppercase">
-                          {payment.currency}
-                        </div>
+                      <div className="text-xs text-muted-foreground uppercase">
+                        {payment.currency}
                       </div>
-
-                      {payment.status === 'COMPLETED' && payment.course && (
-                        <Link href={`/learn/${payment.course.slug}`}>
-                          <Button size="sm">View Course</Button>
-                        </Link>
-                      )}
                     </div>
+
+                    {payment.status === 'COMPLETED' && payment.course && (
+                      <Link href={`/learn/${payment.course.id}`}>
+                        <Button size="sm">View Course</Button>
+                      </Link>
+                    )}
                   </div>
+                </div>
                 ))}
               </div>
             )}

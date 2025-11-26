@@ -106,6 +106,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
+    const isFreeCourse = course.isFree || Number(course.price) === 0;
+
     // Check if already enrolled
     const existingEnrollment = await prisma.enrollment.findUnique({
       where: {
@@ -124,7 +126,7 @@ export async function POST(req: NextRequest) {
     }
 
     // For paid courses, verify payment
-    if (!course.isFree) {
+    if (!isFreeCourse) {
       const payment = await prisma.payment.findFirst({
         where: {
           userId: (session.user as any).id,

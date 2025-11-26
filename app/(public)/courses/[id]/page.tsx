@@ -28,7 +28,6 @@ interface Instructor {
 interface Course {
   id: string;
   title: string;
-  slug: string;
   description: string;
   thumbnail: string | null;
   price: string;
@@ -49,8 +48,13 @@ interface Course {
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
+<<<<<<< HEAD:app/(public)/courses/[slug]/page.tsx
   const { data: session, status } = useSession();
   const slug = params.slug as string;
+=======
+  const { data: session } = useSession();
+  const courseId = params.id as string;
+>>>>>>> a129b023f10ab52f4c8d77d2756e94daf1294e44:app/(public)/courses/[id]/page.tsx
 
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -58,6 +62,7 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     fetchCourse();
+<<<<<<< HEAD:app/(public)/courses/[slug]/page.tsx
   }, [slug, status]);
 
   const fetchCourse = async () => {
@@ -71,6 +76,15 @@ export default function CourseDetailPage() {
         // Fetch full details
         const detailResponse = await fetch(`/api/courses/${foundCourse.id}`);
         const courseData = await detailResponse.json();
+=======
+  }, [courseId]);
+
+  const fetchCourse = async () => {
+    try {
+      const detailResponse = await fetch(`/api/courses/${courseId}`);
+      const courseData = await detailResponse.json();
+      if (detailResponse.ok) {
+>>>>>>> a129b023f10ab52f4c8d77d2756e94daf1294e44:app/(public)/courses/[id]/page.tsx
         setCourse(courseData);
       }
     } catch (error) {
@@ -99,10 +113,15 @@ export default function CourseDetailPage() {
       });
 
       if (response.ok) {
+<<<<<<< HEAD:app/(public)/courses/[slug]/page.tsx
         // Refresh course data to update enrollment status
         fetchCourse();
         // Redirect to watch page
         router.push(`/watch/${slug}`);
+=======
+        // Redirect to course player
+        router.push(`/learn/${course?.id}`);
+>>>>>>> a129b023f10ab52f4c8d77d2756e94daf1294e44:app/(public)/courses/[id]/page.tsx
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to enroll');
@@ -157,6 +176,7 @@ export default function CourseDetailPage() {
   }
 
   const totalDuration = course.lessons.reduce((acc, lesson) => acc + lesson.duration, 0);
+  const isFreeCourse = course.isFree || Number(course.price) === 0;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -217,7 +237,40 @@ export default function CourseDetailPage() {
                       {course.isFree ? 'Free' : formatPrice(course.price)}
                     </div>
                   </div>
+<<<<<<< HEAD:app/(public)/courses/[slug]/page.tsx
                   {course.isFree ? (
+=======
+                </CardContent>
+              </Card>
+
+              {/* Reviews Section */}
+              <div>
+                <h2 className="text-2xl font-bold mb-6">Student Reviews</h2>
+                <ReviewList courseId={course.id} isEnrolled={course.isEnrolled} />
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <Card className="sticky top-4">
+                <CardContent className="pt-6">
+                  <div className="text-center mb-6">
+                    <div className="text-3xl font-bold mb-2">
+                      {isFreeCourse ? 'Free' : formatPrice(course.price)}
+                    </div>
+                    {!isFreeCourse && (
+                      <p className="text-sm text-muted-foreground">One-time payment</p>
+                    )}
+                  </div>
+
+                  {course.isEnrolled ? (
+                    <Link href={`/learn/${course.id}`}>
+                      <Button className="w-full" size="lg">
+                        Continue Learning
+                      </Button>
+                    </Link>
+                  ) : isFreeCourse ? (
+>>>>>>> a129b023f10ab52f4c8d77d2756e94daf1294e44:app/(public)/courses/[id]/page.tsx
                     <Button
                       size="lg"
                       onClick={handleEnroll}

@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 interface Course {
   id: string;
   title: string;
-  slug: string;
   description: string;
   price: string;
   isPublished: boolean;
@@ -269,7 +268,7 @@ export default function AdminCoursesPage() {
                         Edit
                       </Button>
                     </Link>
-                    <Link href={`/courses/${course.slug}`} target="_blank">
+                    <Link href={`/courses/${course.id}`} target="_blank">
                       <Button size="sm" variant="outline">
                         View
                       </Button>

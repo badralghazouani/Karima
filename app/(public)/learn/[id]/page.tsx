@@ -22,7 +22,6 @@ interface Lesson {
 interface Course {
   id: string;
   title: string;
-  slug: string;
   description: string;
   lessons: Lesson[];
   isEnrolled: boolean;
@@ -39,7 +38,7 @@ export default function CoursePlayerPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { data: session, status } = useSession();
-  const slug = params.slug as string;
+  const courseId = params.id as string;
 
   const [course, setCourse] = useState<Course | null>(null);
   const [progress, setProgress] = useState<ProgressRecord[]>([]);
@@ -54,7 +53,7 @@ export default function CoursePlayerPage() {
     } else if (status === 'authenticated') {
       fetchCourse();
     }
-  }, [status, slug]);
+  }, [status, courseId]);
 
   useEffect(() => {
     if (course && course.lessons.length > 0) {
@@ -74,28 +73,25 @@ export default function CoursePlayerPage() {
 
   const fetchCourse = async () => {
     try {
-      // Fetch course by slug
-      const response = await fetch(`/api/courses?search=${slug}`);
-      const courses = await response.json();
-      const foundCourse = courses.find((c: Course) => c.slug === slug);
+      const detailResponse = await fetch(`/api/courses/${courseId}`);
+      const courseData = await detailResponse.json();
 
-      if (foundCourse) {
-        // Fetch full details
-        const detailResponse = await fetch(`/api/courses/${foundCourse.id}`);
-        const courseData = await detailResponse.json();
-
-        if (!courseData.canAccess) {
-          router.push(`/courses/${slug}`);
-          return;
-        }
-
-        setCourse(courseData);
-
-        // Fetch progress
-        const progressResponse = await fetch(`/api/progress?courseId=${courseData.id}`);
-        const progressData = await progressResponse.json();
-        setProgress(progressData);
+      if (!detailResponse.ok) {
+        setCourse(null);
+        return;
       }
+
+      if (!courseData.canAccess) {
+        router.push(`/courses/${courseId}`);
+        return;
+      }
+
+      setCourse(courseData);
+
+      // Fetch progress
+      const progressResponse = await fetch(`/api/progress?courseId=${courseData.id}`);
+      const progressData = await progressResponse.json();
+      setProgress(progressData);
     } catch (error) {
       console.error('Failed to fetch course:', error);
     } finally {
@@ -136,7 +132,7 @@ export default function CoursePlayerPage() {
     if (currentIndex < course.lessons.length - 1) {
       const nextLesson = course.lessons[currentIndex + 1];
       setCurrentLesson(nextLesson);
-      router.push(`/learn/${slug}?lesson=${nextLesson.id}`);
+      router.push(`/learn/${course.id}?lesson=${nextLesson.id}`);
     }
   };
 
@@ -147,7 +143,7 @@ export default function CoursePlayerPage() {
     if (currentIndex > 0) {
       const prevLesson = course.lessons[currentIndex - 1];
       setCurrentLesson(prevLesson);
-      router.push(`/learn/${slug}?lesson=${prevLesson.id}`);
+      router.push(`/learn/${course.id}?lesson=${prevLesson.id}`);
     }
   };
 
@@ -260,7 +256,7 @@ export default function CoursePlayerPage() {
                     key={lesson.id}
                     onClick={() => {
                       setCurrentLesson(lesson);
-                      router.push(`/learn/${slug}?lesson=${lesson.id}`);
+                      router.push(`/learn/${course.id}?lesson=${lesson.id}`);
                       setIsSidebarOpen(false);
                     }}
                     className={`w-full text-left p-4 hover:bg-accent transition-colors ${
