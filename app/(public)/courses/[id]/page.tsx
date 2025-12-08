@@ -48,13 +48,8 @@ interface Course {
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
-<<<<<<< HEAD:app/(public)/courses/[slug]/page.tsx
-  const { data: session, status } = useSession();
-  const slug = params.slug as string;
-=======
   const { data: session } = useSession();
   const courseId = params.id as string;
->>>>>>> a129b023f10ab52f4c8d77d2756e94daf1294e44:app/(public)/courses/[id]/page.tsx
 
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,21 +57,6 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     fetchCourse();
-<<<<<<< HEAD:app/(public)/courses/[slug]/page.tsx
-  }, [slug, status]);
-
-  const fetchCourse = async () => {
-    try {
-      // Fetch course by slug
-      const response = await fetch(`/api/courses?search=${slug}`);
-      const courses = await response.json();
-      const foundCourse = courses.find((c: Course) => c.slug === slug);
-
-      if (foundCourse) {
-        // Fetch full details
-        const detailResponse = await fetch(`/api/courses/${foundCourse.id}`);
-        const courseData = await detailResponse.json();
-=======
   }, [courseId]);
 
   const fetchCourse = async () => {
@@ -84,7 +64,6 @@ export default function CourseDetailPage() {
       const detailResponse = await fetch(`/api/courses/${courseId}`);
       const courseData = await detailResponse.json();
       if (detailResponse.ok) {
->>>>>>> a129b023f10ab52f4c8d77d2756e94daf1294e44:app/(public)/courses/[id]/page.tsx
         setCourse(courseData);
       }
     } catch (error) {
@@ -95,8 +74,8 @@ export default function CourseDetailPage() {
   };
 
   const handleEnroll = async () => {
-    if (status === 'unauthenticated') {
-      router.push(`/auth/login?redirect=/courses/${slug}`);
+    if (!session) {
+      router.push(`/auth/login?redirect=/courses/${courseId}`);
       return;
     }
 
@@ -113,15 +92,8 @@ export default function CourseDetailPage() {
       });
 
       if (response.ok) {
-<<<<<<< HEAD:app/(public)/courses/[slug]/page.tsx
-        // Refresh course data to update enrollment status
-        fetchCourse();
-        // Redirect to watch page
-        router.push(`/watch/${slug}`);
-=======
         // Redirect to course player
         router.push(`/learn/${course?.id}`);
->>>>>>> a129b023f10ab52f4c8d77d2756e94daf1294e44:app/(public)/courses/[id]/page.tsx
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to enroll');
@@ -135,8 +107,8 @@ export default function CourseDetailPage() {
   };
 
   const handleBuyCourse = () => {
-    if (status === 'unauthenticated') {
-      router.push(`/auth/login?redirect=/courses/${slug}`);
+    if (!session) {
+      router.push(`/auth/login?redirect=/courses/${courseId}`);
       return;
     }
     // Redirect to checkout
@@ -223,7 +195,7 @@ export default function CourseDetailPage() {
               {/* Enrollment CTA */}
               {course.isEnrolled || course.canAccess ? (
                 <div className="flex gap-3">
-                  <Button size="lg" onClick={() => router.push(`/watch/${slug}`)}>
+                  <Button size="lg" onClick={() => router.push(`/learn/${course.id}`)}>
                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z" />
                     </svg>
@@ -237,40 +209,7 @@ export default function CourseDetailPage() {
                       {course.isFree ? 'Free' : formatPrice(course.price)}
                     </div>
                   </div>
-<<<<<<< HEAD:app/(public)/courses/[slug]/page.tsx
-                  {course.isFree ? (
-=======
-                </CardContent>
-              </Card>
-
-              {/* Reviews Section */}
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Student Reviews</h2>
-                <ReviewList courseId={course.id} isEnrolled={course.isEnrolled} />
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <Card className="sticky top-4">
-                <CardContent className="pt-6">
-                  <div className="text-center mb-6">
-                    <div className="text-3xl font-bold mb-2">
-                      {isFreeCourse ? 'Free' : formatPrice(course.price)}
-                    </div>
-                    {!isFreeCourse && (
-                      <p className="text-sm text-muted-foreground">One-time payment</p>
-                    )}
-                  </div>
-
-                  {course.isEnrolled ? (
-                    <Link href={`/learn/${course.id}`}>
-                      <Button className="w-full" size="lg">
-                        Continue Learning
-                      </Button>
-                    </Link>
-                  ) : isFreeCourse ? (
->>>>>>> a129b023f10ab52f4c8d77d2756e94daf1294e44:app/(public)/courses/[id]/page.tsx
+                  {isFreeCourse ? (
                     <Button
                       size="lg"
                       onClick={handleEnroll}
@@ -408,13 +347,13 @@ export default function CourseDetailPage() {
 
                   <div className="pt-4 border-t">
                     <div className="text-2xl font-bold mb-4">
-                      {course.isFree ? 'Free' : formatPrice(course.price)}
+                      {isFreeCourse ? 'Free' : formatPrice(course.price)}
                     </div>
                     {course.isEnrolled || course.canAccess ? (
                       <Button
                         className="w-full"
                         size="lg"
-                        onClick={() => router.push(`/watch/${slug}`)}
+                        onClick={() => router.push(`/learn/${course.id}`)}
                       >
                         <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z" />
@@ -423,7 +362,7 @@ export default function CourseDetailPage() {
                       </Button>
                     ) : (
                       <>
-                        {course.isFree ? (
+                        {isFreeCourse ? (
                           <Button
                             className="w-full"
                             size="lg"
