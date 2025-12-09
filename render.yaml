@@ -5,7 +5,7 @@ services:
     runtime: node
     plan: starter
     region: oregon
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npm run build:production
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
@@ -22,11 +22,9 @@ services:
         sync: false
     autoDeploy: true
 
+databases:
   # PostgreSQL Database
-  - type: pgsql
-    name: karima-db
+  - name: karima-db
     plan: starter
     region: oregon
-    databaseName: karima
-    databaseUser: karima
     ipAllowList: []

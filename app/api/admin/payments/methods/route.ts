@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { getServerSession } from 'next-auth';
+
 import { authOptions } from '@/lib/auth';
+
 import { prisma } from '@/lib/prisma';
+
 import { getPaymentMethods, updatePaymentMethod, initializePaymentMethods } from '@/lib/payment-utils';
 
+
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
 /**
  * GET /api/admin/payments/methods
  * Get all payment methods (Admin only)

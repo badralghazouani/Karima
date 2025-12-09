@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { getServerSession } from 'next-auth';
+
 import { authOptions } from '@/lib/auth';
+
 import { prisma } from '@/lib/prisma';
+
 import { createFakePayment } from '@/lib/payment-utils';
 
+
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
 /**
  * POST /api/admin/payments/test-payment
  * Create a fake payment for testing purposes (Admin only)

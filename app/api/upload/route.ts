@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+
 import { authOptions } from '@/lib/auth';
 import { validateFile } from '@/lib/upload';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
