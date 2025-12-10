@@ -292,14 +292,18 @@ model Payment {
   currency        String        @default("USD")
   status          PaymentStatus @default(PENDING)
   stripePaymentId String?       @unique
+  paymentMethodId String?
+  isFake          Boolean       @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([stripePaymentId])
+  @@index([paymentMethodId])
 }
 
 enum PaymentStatus {
@@ -307,6 +311,30 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+model PaymentMethod {
+  id              String  @id @default(cuid())
+  name            String
+  type            PaymentMethodType
+  isActive        Boolean @default(true)
+  description     String?
+  testModeSupported Boolean @default(false)
+  requiresWebhook Boolean @default(false)
+
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+}
+
+enum PaymentMethodType {
+  STRIPE
+  PAYPAL
+  BANK_TRANSFER
+  TEST
 }
 
 // ============================================
