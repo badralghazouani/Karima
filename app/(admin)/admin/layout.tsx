@@ -55,6 +55,18 @@ export default async function AdminLayout({
               >
                 🏷️ Categories
               </a>
+              <a
+                href="/admin/student-groups"
+                className="block px-4 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+              >
+                👨‍🎓 Student Groups
+              </a>
+              <a
+                href="/admin/publication-calendar"
+                className="block px-4 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+              >
+                📅 Publication Calendar
+              </a>
             </nav>
           </div>
         </aside>
