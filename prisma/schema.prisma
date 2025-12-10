@@ -32,6 +32,7 @@ model User {
   exerciseSubmissions ExerciseSubmission[]
   coursesCreated      Course[]               @relation("InstructorCourses")
   reviews             Review[]
+  groupMemberships    StudentGroupMember[]
 
   @@index([email])
 }
@@ -59,6 +60,10 @@ model Course {
   level       Level    @default(BEGINNER)
   language    String   @default("en")
 
+  // Publication Scheduling
+  publicationDate DateTime?
+  status          CourseStatus @default(DRAFT)
+
   instructorId String
   instructor   User   @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
 
@@ -66,17 +71,20 @@ model Course {
   updatedAt DateTime @updatedAt
 
   // Relations
-  lessons     Lesson[]
-  documents   Document[]
-  enrollments Enrollment[]
-  categories  CourseCategory[]
-  exercises   Exercise[]
-  reviews     Review[]
+  lessons            Lesson[]
+  documents          Document[]
+  enrollments        Enrollment[]
+  categories         CourseCategory[]
+  exercises          Exercise[]
+  reviews            Review[]
+  groupRequirements  CourseGroupRequirement[]
 
   @@index([instructorId])
   @@index([slug])
   @@index([isPublished])
   @@index([isArchived])
+  @@index([status])
+  @@index([publicationDate])
 }
 
 enum Level {
@@ -84,6 +92,13 @@ enum Level {
   INTERMEDIATE
   ADVANCED
   ALL_LEVELS
+}
+
+enum CourseStatus {
+  DRAFT
+  SCHEDULED
+  PENDING_GROUP
+  PUBLISHED
 }
 
 model Category {
@@ -189,6 +204,57 @@ model Progress {
   @@unique([userId, lessonId])
   @@index([userId])
   @@index([lessonId])
+}
+
+// ============================================
+// STUDENT GROUPS
+// ============================================
+
+model StudentGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  maxSize     Int?     // Optional max group size
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  members           StudentGroupMember[]
+  courseRequirements CourseGroupRequirement[]
+
+  @@index([name])
+}
+
+model StudentGroupMember {
+  id      String @id @default(cuid())
+  userId  String
+  groupId String
+
+  user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group StudentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, groupId])
+  @@index([userId])
+  @@index([groupId])
+}
+
+model CourseGroupRequirement {
+  id               String  @id @default(cuid())
+  courseId         String
+  groupId          String
+  requireFullGroup Boolean @default(true) // If true, all group members must enroll
+
+  course Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  group  StudentGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([courseId, groupId])
+  @@index([courseId])
+  @@index([groupId])
 }
 
 // ============================================
