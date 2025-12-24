@@ -13,10 +13,7 @@ export function useTranslation() {
     setMessages(getMessages(currentLocale));
   }, []);
 
-  const t = (
-    key: string,
-    params?: Record<string, string | number | null | undefined>
-  ): string => {
+  const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
     let value: any = messages;
 
@@ -37,10 +34,7 @@ export function useTranslation() {
     }
 
     return Object.entries(params).reduce((result, [paramKey, paramValue]) => {
-      return result.replace(
-        new RegExp(`{{\\s*${paramKey}\\s*}}`, 'g'),
-        String(paramValue ?? '')
-      );
+      return result.replace(new RegExp(`{{\\s*${paramKey}\\s*}}`, 'g'), String(paramValue));
     }, value);
   };
 
