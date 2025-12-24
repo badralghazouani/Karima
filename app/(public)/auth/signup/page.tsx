@@ -7,9 +7,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,13 +35,13 @@ export default function SignupPage() {
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordsDoNotMatch'));
       return;
     }
 
     // Validate password length
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError(t('auth.passwordTooShort'));
       return;
     }
 
@@ -62,7 +64,7 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to create account');
+        setError(data.error || t('auth.failedToCreateAccount'));
         return;
       }
 
@@ -74,7 +76,7 @@ export default function SignupPage() {
       });
 
       if (result?.error) {
-        setError('Account created but failed to sign in. Please try logging in.');
+        setError(t('auth.createdButSignInFailed'));
         router.push('/auth/login');
       } else {
         // Redirect based on role
@@ -86,7 +88,7 @@ export default function SignupPage() {
         router.refresh();
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('common.errorGeneric'));
     } finally {
       setIsLoading(false);
     }
@@ -97,10 +99,10 @@ export default function SignupPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Create an Account
+            {t('auth.createAccountTitle')}
           </CardTitle>
           <CardDescription className="text-center">
-            Join Karima to start learning or teaching
+            {t('auth.createAccountSubtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -113,13 +115,13 @@ export default function SignupPage() {
 
             <div className="space-y-2">
               <label htmlFor="name" className="text-sm font-medium">
-                Full Name
+                {t('auth.fullName')}
               </label>
               <Input
                 id="name"
                 name="name"
                 type="text"
-                placeholder="John Doe"
+                placeholder={t('auth.namePlaceholder')}
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -129,13 +131,13 @@ export default function SignupPage() {
 
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
-                Email
+                {t('common.email')}
               </label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t('auth.emailPlaceholder')}
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -145,7 +147,7 @@ export default function SignupPage() {
 
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">
-                Password
+                {t('common.password')}
               </label>
               <Input
                 id="password"
@@ -158,13 +160,13 @@ export default function SignupPage() {
                 disabled={isLoading}
               />
               <p className="text-xs text-muted-foreground">
-                Must be at least 8 characters
+                {t('auth.passwordHint')}
               </p>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="confirmPassword" className="text-sm font-medium">
-                Confirm Password
+                {t('auth.confirmPassword')}
               </label>
               <Input
                 id="confirmPassword"
@@ -180,7 +182,7 @@ export default function SignupPage() {
 
             <div className="space-y-2">
               <label htmlFor="role" className="text-sm font-medium">
-                I want to
+                {t('auth.rolePrompt')}
               </label>
               <select
                 id="role"
@@ -190,8 +192,8 @@ export default function SignupPage() {
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 disabled={isLoading}
               >
-                <option value="STUDENT">Learn (Student)</option>
-                <option value="INSTRUCTOR">Teach (Instructor)</option>
+                <option value="STUDENT">{t('auth.roleStudent')}</option>
+                <option value="INSTRUCTOR">{t('auth.roleInstructor')}</option>
               </select>
             </div>
 
@@ -200,25 +202,25 @@ export default function SignupPage() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? t('auth.creatingAccount') : t('auth.createAccount')}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center text-muted-foreground">
-            Already have an account?{' '}
+            {t('auth.haveAccount')}{' '}
             <Link href="/auth/login" className="text-primary hover:underline">
-              Sign in
+              {t('common.login')}
             </Link>
           </div>
           <div className="text-xs text-center text-muted-foreground">
-            By creating an account, you agree to our{' '}
+            {t('auth.termsAgreement')}{' '}
             <Link href="/terms" className="text-primary hover:underline">
-              Terms of Service
+              {t('auth.termsOfService')}
             </Link>{' '}
-            and{' '}
+            {t('auth.and')}{' '}
             <Link href="/privacy" className="text-primary hover:underline">
-              Privacy Policy
+              {t('auth.privacyPolicy')}
             </Link>
           </div>
         </CardFooter>

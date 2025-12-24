@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type Hls from 'hls.js';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface VideoPlayerProps {
   src: string;
@@ -11,6 +12,7 @@ interface VideoPlayerProps {
 }
 
 export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlayerProps) {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -126,7 +128,7 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
         hls.destroy();
       }
     };
-  }, [src]);
+  }, [autoPlay, src]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -214,7 +216,26 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [volume]);
+  }, [isMuted, isPlaying, volume]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const togglePlayPause = () => {
     const video = videoRef.current;
@@ -312,8 +333,8 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
     return (
       <div className="relative w-full h-full bg-black flex items-center justify-center text-white">
         <div className="text-center space-y-3 px-4">
-          <p className="text-lg font-semibold">Unable to load video</p>
-          <p className="text-sm text-white/70">Check the video URL or try again later.</p>
+          <p className="text-lg font-semibold">{t('video.errorTitle')}</p>
+          <p className="text-sm text-white/70">{t('video.errorDescription')}</p>
           <button
             onClick={() => {
               setHasError(false);
@@ -327,7 +348,7 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
             }}
             className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded text-sm"
           >
-            Retry
+            {t('video.retry')}
           </button>
         </div>
       </div>
@@ -351,7 +372,7 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
               />
             </svg>
-            <span>Loading video...</span>
+            <span>{t('video.loading')}</span>
           </div>
         </div>
       )}
@@ -366,7 +387,7 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
         onClick={togglePlayPause}
         muted={autoPlay}
       >
-        Your browser does not support the video tag.
+        {t('video.unsupported')}
       </video>
 
       {/* Controls Overlay */}

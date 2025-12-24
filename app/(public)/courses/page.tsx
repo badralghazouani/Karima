@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { CourseCard } from '@/components/courses/course-card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Category {
   id: string;
@@ -30,6 +31,7 @@ interface Course {
 }
 
 export default function CoursesPage() {
+  const { t } = useTranslation();
   const [courses, setCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,9 +94,9 @@ export default function CoursesPage() {
         {/* Page Header */}
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold mb-4">All Courses</h1>
+            <h1 className="text-4xl font-bold mb-4">{t('courses.allCoursesTitle')}</h1>
             <p className="text-lg text-muted-foreground">
-              Explore our collection of courses and start learning today
+              {t('courses.allCoursesSubtitle')}
             </p>
           </div>
         </div>
@@ -107,7 +109,7 @@ export default function CoursesPage() {
               value={filters.category}
               onChange={(e) => handleFilterChange('category', e.target.value)}
             >
-              <option value="">All Categories</option>
+              <option value="">{t('courses.allCategories')}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.slug}>
                   {category.name}
@@ -120,11 +122,11 @@ export default function CoursesPage() {
               value={filters.level}
               onChange={(e) => handleFilterChange('level', e.target.value)}
             >
-              <option value="">All Levels</option>
-              <option value="BEGINNER">Beginner</option>
-              <option value="INTERMEDIATE">Intermediate</option>
-              <option value="ADVANCED">Advanced</option>
-              <option value="ALL_LEVELS">All Levels</option>
+              <option value="">{t('courses.allLevels')}</option>
+              <option value="BEGINNER">{t('courses.beginner')}</option>
+              <option value="INTERMEDIATE">{t('courses.intermediate')}</option>
+              <option value="ADVANCED">{t('courses.advanced')}</option>
+              <option value="ALL_LEVELS">{t('courses.allLevels')}</option>
             </select>
 
             <select
@@ -132,14 +134,14 @@ export default function CoursesPage() {
               value={filters.isFree}
               onChange={(e) => handleFilterChange('isFree', e.target.value)}
             >
-              <option value="">All Prices</option>
-              <option value="true">Free</option>
-              <option value="false">Paid</option>
+              <option value="">{t('courses.allPrices')}</option>
+              <option value="true">{t('courses.free')}</option>
+              <option value="false">{t('courses.paid')}</option>
             </select>
 
             <input
               type="search"
-              placeholder="Search courses..."
+              placeholder={t('courses.searchPlaceholder')}
               className="flex-1 min-w-[200px] px-4 py-2 border rounded-md"
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
@@ -149,7 +151,7 @@ export default function CoursesPage() {
           {/* Courses Grid */}
           {isLoading ? (
             <div className="text-center py-16">
-              <p className="text-muted-foreground">Loading courses...</p>
+              <p className="text-muted-foreground">{t('courses.loading')}</p>
             </div>
           ) : courses.length === 0 ? (
             <div className="text-center py-16">
@@ -168,15 +170,18 @@ export default function CoursesPage() {
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold mb-2">No courses found</h2>
+              <h2 className="text-2xl font-bold mb-2">{t('courses.noneTitle')}</h2>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Try adjusting your filters or check back later for new courses
+                {t('courses.noneSubtitle')}
               </p>
             </div>
           ) : (
             <>
               <div className="mb-4 text-sm text-muted-foreground">
-                Showing {courses.length} {courses.length === 1 ? 'course' : 'courses'}
+                {t('courses.showingCount', {
+                  count: courses.length,
+                  label: courses.length === 1 ? t('courses.course') : t('courses.courses'),
+                })}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {courses.map((course) => (
