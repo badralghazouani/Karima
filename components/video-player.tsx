@@ -126,7 +126,7 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
         hls.destroy();
       }
     };
-  }, [src]);
+  }, [autoPlay, src]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -214,7 +214,26 @@ export function VideoPlayer({ src, title, onEnded, autoPlay = false }: VideoPlay
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [volume]);
+  }, [isMuted, isPlaying, volume]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const togglePlayPause = () => {
     const video = videoRef.current;
