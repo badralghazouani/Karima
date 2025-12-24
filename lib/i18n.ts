@@ -1,13 +1,15 @@
 import enMessages from '@/messages/en.json';
 import frMessages from '@/messages/fr.json';
+import arMessages from '@/messages/ar.json';
 
-export type Locale = 'en' | 'fr';
+export type Locale = 'en' | 'fr' | 'ar';
 export const defaultLocale: Locale = 'en';
-export const locales: Locale[] = ['en', 'fr'];
+export const locales: Locale[] = ['en', 'fr', 'ar'];
 
 const messages = {
   en: enMessages,
   fr: frMessages,
+  ar: arMessages,
 };
 
 function getLocaleFromCookie(): Locale | null {

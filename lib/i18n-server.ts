@@ -1,17 +1,14 @@
-'use client';
+import { cookies } from 'next/headers';
+import { defaultLocale, getMessages, locales, type Locale } from '@/lib/i18n';
 
-import { useEffect, useState } from 'react';
-import { getLocale, getMessages, type Locale } from '@/lib/i18n';
+export function getServerLocale(): Locale {
+  const cookieLocale = cookies().get('locale')?.value as Locale | undefined;
+  return cookieLocale && locales.includes(cookieLocale) ? cookieLocale : defaultLocale;
+}
 
-export function useTranslation() {
-  const [locale, setLocale] = useState<Locale>('en');
-  const [messages, setMessages] = useState(getMessages('en'));
-
-  useEffect(() => {
-    const currentLocale = getLocale();
-    setLocale(currentLocale);
-    setMessages(getMessages(currentLocale));
-  }, []);
+export function getServerTranslator() {
+  const locale = getServerLocale();
+  const messages = getMessages(locale);
 
   const t = (
     key: string,
@@ -24,7 +21,7 @@ export function useTranslation() {
       if (value && typeof value === 'object' && k in value) {
         value = value[k];
       } else {
-        return key; // Return key if translation not found
+        return key;
       }
     }
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { StarRating } from '@/components/ui/star-rating';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ReviewFormProps {
   courseId: string;
@@ -20,6 +21,7 @@ export function ReviewForm({
   existingReview,
   onSuccess,
 }: ReviewFormProps) {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [comment, setComment] = useState(existingReview?.comment || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +31,7 @@ export function ReviewForm({
     e.preventDefault();
 
     if (rating === 0) {
-      setError('Please select a rating');
+      setError(t('reviews.selectRating'));
       return;
     }
 
@@ -56,14 +58,14 @@ export function ReviewForm({
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to submit review');
+        throw new Error(data.error || t('reviews.failedToSubmit'));
       }
 
       if (onSuccess) {
         onSuccess();
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit review');
+      setError(err instanceof Error ? err.message : t('reviews.failedToSubmit'));
     } finally {
       setIsSubmitting(false);
     }
@@ -72,13 +74,13 @@ export function ReviewForm({
   return (
     <Card className="p-6">
       <h3 className="text-lg font-semibold mb-4">
-        {existingReview ? 'Edit Your Review' : 'Write a Review'}
+        {existingReview ? t('reviews.editReview') : t('reviews.writeReview')}
       </h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-2">
-            Your Rating *
+            {t('reviews.yourRating')} *
           </label>
           <StarRating
             rating={rating}
@@ -89,13 +91,13 @@ export function ReviewForm({
 
         <div>
           <label htmlFor="comment" className="block text-sm font-medium mb-2">
-            Your Review (Optional)
+            {t('reviews.yourReviewOptional')}
           </label>
           <textarea
             id="comment"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Share your experience with this course..."
+            placeholder={t('reviews.reviewPlaceholder')}
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
           />
@@ -110,10 +112,10 @@ export function ReviewForm({
         <div className="flex gap-2">
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting
-              ? 'Submitting...'
+              ? t('reviews.submitting')
               : existingReview
-              ? 'Update Review'
-              : 'Submit Review'}
+              ? t('reviews.updateReview')
+              : t('reviews.submitReview')}
           </Button>
         </div>
       </form>

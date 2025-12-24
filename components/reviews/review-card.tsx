@@ -4,6 +4,8 @@ import { StarRating } from '@/components/ui/star-rating';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { formatDistanceToNow } from 'date-fns';
+import { arSA, fr } from 'date-fns/locale';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ReviewCardProps {
   review: {
@@ -28,7 +30,9 @@ export function ReviewCard({
   onEdit,
   onDelete,
 }: ReviewCardProps) {
+  const { t, locale } = useTranslation();
   const isOwnReview = currentUserId === review.user.id;
+  const dateLocale = locale === 'fr' ? fr : locale === 'ar' ? arSA : undefined;
 
   return (
     <Card className="p-6">
@@ -38,13 +42,13 @@ export function ReviewCard({
           {review.user.avatar ? (
             <img
               src={review.user.avatar}
-              alt={review.user.name || 'User'}
+              alt={review.user.name || t('common.user')}
               className="w-12 h-12 rounded-full object-cover"
             />
           ) : (
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-lg font-semibold text-primary">
-                {(review.user.name || 'U')[0].toUpperCase()}
+                {(review.user.name || t('common.user'))[0].toUpperCase()}
               </span>
             </div>
           )}
@@ -55,13 +59,14 @@ export function ReviewCard({
           <div className="flex items-start justify-between gap-2">
             <div>
               <h4 className="font-semibold">
-                {review.user.name || 'Anonymous'}
+                {review.user.name || t('common.anonymous')}
               </h4>
               <div className="flex items-center gap-2 mt-1">
                 <StarRating rating={review.rating} readonly size="sm" />
                 <span className="text-sm text-muted-foreground">
                   {formatDistanceToNow(new Date(review.createdAt), {
                     addSuffix: true,
+                    locale: dateLocale,
                   })}
                 </span>
               </div>
@@ -76,7 +81,7 @@ export function ReviewCard({
                     size="sm"
                     onClick={() => onEdit(review)}
                   >
-                    Edit
+                    {t('common.edit')}
                   </Button>
                 )}
                 {onDelete && (
@@ -85,7 +90,7 @@ export function ReviewCard({
                     size="sm"
                     onClick={() => onDelete(review.id)}
                   >
-                    Delete
+                    {t('common.delete')}
                   </Button>
                 )}
               </div>

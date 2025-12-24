@@ -7,6 +7,7 @@ import { ReviewForm } from './review-form';
 import { StarRating } from '@/components/ui/star-rating';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Review {
   id: string;
@@ -39,6 +40,7 @@ interface ReviewListProps {
 
 export function ReviewList({ courseId, isEnrolled }: ReviewListProps) {
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [stats, setStats] = useState<ReviewStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +67,7 @@ export function ReviewList({ courseId, isEnrolled }: ReviewListProps) {
   }, [courseId]);
 
   const handleDelete = async (reviewId: string) => {
-    if (!confirm('Are you sure you want to delete this review?')) {
+    if (!confirm(t('reviews.confirmDelete'))) {
       return;
     }
 
@@ -92,7 +94,7 @@ export function ReviewList({ courseId, isEnrolled }: ReviewListProps) {
   const canReview = isEnrolled && !userReview && !showForm && !editingReview;
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading reviews...</div>;
+    return <div className="text-center py-8">{t('reviews.loading')}</div>;
   }
 
   return (
@@ -126,7 +128,7 @@ export function ReviewList({ courseId, isEnrolled }: ReviewListProps) {
 
                 return (
                   <div key={star} className="flex items-center gap-2 text-sm">
-                    <span className="w-12">{star} star</span>
+                    <span className="w-12">{t('reviews.starLabel', { count: star })}</span>
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-yellow-400 h-2 rounded-full"
@@ -146,7 +148,7 @@ export function ReviewList({ courseId, isEnrolled }: ReviewListProps) {
 
       {/* Review Form */}
       {canReview && (
-        <Button onClick={() => setShowForm(true)}>Write a Review</Button>
+        <Button onClick={() => setShowForm(true)}>{t('reviews.writeReview')}</Button>
       )}
 
       {showForm && !editingReview && (
@@ -167,12 +169,12 @@ export function ReviewList({ courseId, isEnrolled }: ReviewListProps) {
       {/* Reviews List */}
       <div>
         <h3 className="text-xl font-semibold mb-4">
-          Reviews ({stats?.totalReviews || 0})
+          {t('reviews.reviewsCount', { count: stats?.totalReviews || 0 })}
         </h3>
 
         {reviews.length === 0 ? (
           <Card className="p-8 text-center text-muted-foreground">
-            No reviews yet. Be the first to review this course!
+            {t('reviews.empty')}
           </Card>
         ) : (
           <div className="space-y-4">

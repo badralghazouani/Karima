@@ -4,48 +4,48 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 12%;
+    --background: 0 0% 100%;
+    --foreground: 222 40% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 12%;
+    --card-foreground: 222 40% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 12%;
-    --primary: 195 85% 45%;
+    --popover-foreground: 222 40% 12%;
+    --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 213 27% 92%;
-    --secondary-foreground: 222 47% 12%;
-    --muted: 215 20% 80%;
+    --secondary: 220 16% 96%;
+    --secondary-foreground: 222 40% 12%;
+    --muted: 220 16% 90%;
     --muted-foreground: 215 16% 35%;
-    --accent: 188 80% 90%;
-    --accent-foreground: 210 40% 20%;
+    --accent: 220 20% 94%;
+    --accent-foreground: 222 40% 12%;
     --destructive: 0 72% 50%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214 25% 85%;
-    --input: 214 25% 85%;
-    --ring: 195 85% 45%;
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: 221 83% 53%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 220 26% 10%;
+    --background: 222 30% 8%;
     --foreground: 210 36% 96%;
     --card: 222 28% 12%;
     --card-foreground: 210 36% 96%;
     --popover: 222 28% 12%;
     --popover-foreground: 210 36% 96%;
-    --primary: 195 100% 70%;
-    --primary-foreground: 220 26% 10%;
-    --secondary: 221 25% 18%;
+    --primary: 221 83% 65%;
+    --primary-foreground: 222 30% 8%;
+    --secondary: 222 20% 18%;
     --secondary-foreground: 210 36% 96%;
-    --muted: 221 20% 30%;
+    --muted: 222 20% 25%;
     --muted-foreground: 214 14% 75%;
-    --accent: 193 70% 25%;
+    --accent: 222 20% 20%;
     --accent-foreground: 210 36% 96%;
     --destructive: 0 62% 55%;
     --destructive-foreground: 210 36% 96%;
-    --border: 221 25% 18%;
-    --input: 221 25% 18%;
-    --ring: 195 100% 70%;
+    --border: 222 20% 18%;
+    --input: 222 20% 18%;
+    --ring: 221 83% 65%;
   }
 }
 
@@ -56,6 +56,25 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+html[dir='rtl'] body {
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir='rtl'] .rtl-space-x {
+  --tw-space-x-reverse: 1;
+}
+
+html[dir='rtl'] .rtl-select {
+  padding-right: 0.75rem;
+  padding-left: 2.25rem;
+}
+
+html[dir='rtl'] .rtl-select-arrow {
+  right: auto;
+  left: 0.5rem;
 }
 
 /* Custom scrollbar */
