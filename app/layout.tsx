@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Cairo, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
 import { cookies } from 'next/headers';
@@ -10,6 +10,10 @@ const plusJakarta = Plus_Jakarta_Sans({
   display: 'swap',
 });
 
+const cairo = Cairo({
+  subsets: ['arabic'],
+  display: 'swap',
+});
 export const metadata: Metadata = {
   title: 'Karima - Online Course Platform',
   description: 'Learn new skills with our comprehensive online courses',
@@ -26,10 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const locale = getServerLocale();
+  const isRtl = locale === 'ar';
 
   return (
-    <html lang={locale}>
-      <body className={plusJakarta.className}>
+    <html lang={locale} dir={isRtl ? 'rtl' : 'ltr'}>
+      <body className={isRtl ? cairo.className : plusJakarta.className}>
         <Providers>
           {children}
         </Providers>

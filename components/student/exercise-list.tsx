@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { ExerciseView } from './exercise-view';
 import { Card } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface QuizOption {
   id: string;
@@ -32,6 +33,7 @@ interface ExerciseListProps {
 }
 
 export function ExerciseList({ courseId }: ExerciseListProps) {
+  const { t } = useTranslation();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -83,14 +85,14 @@ export function ExerciseList({ courseId }: ExerciseListProps) {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading exercises...</div>;
+    return <div className="text-center py-8">{t('exercises.loading')}</div>;
   }
 
   if (exercises.length === 0) {
     return (
       <Card className="p-8 text-center">
         <p className="text-muted-foreground">
-          No exercises available for this course yet.
+          {t('exercises.empty')}
         </p>
       </Card>
     );
@@ -103,12 +105,12 @@ export function ExerciseList({ courseId }: ExerciseListProps) {
     <div className="space-y-6">
       {/* Progress Stats */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Your Progress</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('exercises.progressTitle')}</h3>
         <div className="grid md:grid-cols-2 gap-6">
           {/* Completion */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Exercises Completed</span>
+              <span className="text-sm font-medium">{t('exercises.exercisesCompleted')}</span>
               <span className="text-sm font-semibold">
                 {progress.completed} / {progress.total}
               </span>
@@ -124,9 +126,13 @@ export function ExerciseList({ courseId }: ExerciseListProps) {
           {/* Score */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Total Score</span>
+              <span className="text-sm font-medium">{t('exercises.totalScore')}</span>
               <span className="text-sm font-semibold">
-                {score.earned} / {score.total} pts ({score.percentage}%)
+                {t('exercises.scoreSummary', {
+                  earned: score.earned,
+                  total: score.total,
+                  percentage: score.percentage,
+                })}
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -141,7 +147,7 @@ export function ExerciseList({ courseId }: ExerciseListProps) {
 
       {/* Exercise List */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Exercises & Quizzes</h3>
+        <h3 className="text-lg font-semibold">{t('exercises.title')}</h3>
         {exercises.map((exercise, index) => (
           <div key={exercise.id}>
             {/* Exercise Header */}
@@ -159,7 +165,7 @@ export function ExerciseList({ courseId }: ExerciseListProps) {
                   <div className="flex-1">
                     <h4 className="font-medium">{exercise.title}</h4>
                     <p className="text-sm text-muted-foreground">
-                      {exercise.type.replace('_', ' ')} • {exercise.points} points
+                      {t(`exercises.type.${exercise.type}`)} • {t('exercises.pointsLabel', { points: exercise.points })}
                     </p>
                   </div>
                 </div>
@@ -168,9 +174,9 @@ export function ExerciseList({ courseId }: ExerciseListProps) {
                     <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
                       {exercise.submissions[0].isCorrect !== null
                         ? exercise.submissions[0].isCorrect
-                          ? '✓ Correct'
-                          : '✗ Incorrect'
-                        : 'Submitted'}
+                          ? t('exercises.correctStatus')
+                          : t('exercises.incorrectStatus')
+                        : t('exercises.submittedStatus')}
                     </span>
                   )}
                   <svg

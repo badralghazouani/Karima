@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatPrice, formatDuration } from '@/lib/utils';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface CourseCardProps {
   course: {
@@ -23,6 +26,7 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course }: CourseCardProps) {
+  const { t } = useTranslation();
   const totalDuration = course.lessons?.reduce((acc, lesson) => acc + lesson.duration, 0) || 0;
 
   return (
@@ -79,7 +83,7 @@ export function CourseCard({ course }: CourseCardProps) {
                   d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
                 />
               </svg>
-              <span>{course._count.enrollments} students</span>
+              <span>{t('courses.studentsCount', { count: course._count.enrollments })}</span>
             </div>
           )}
 
@@ -106,17 +110,17 @@ export function CourseCard({ course }: CourseCardProps) {
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            <span>{course.level}</span>
+            <span>{t(`courses.levelLabels.${course.level}`)}</span>
           </div>
         </div>
       </CardContent>
 
       <CardFooter className="flex items-center justify-between pt-4 border-t">
         <div className="text-xl font-bold">
-          {course.isFree || Number(course.price) === 0 ? 'Free' : formatPrice(course.price)}
+          {course.isFree || Number(course.price) === 0 ? t('courses.free') : formatPrice(course.price)}
         </div>
         <Link href={`/courses/${course.id}`}>
-          <Button>View Course</Button>
+          <Button>{t('courses.viewCourse')}</Button>
         </Link>
       </CardFooter>
     </Card>
