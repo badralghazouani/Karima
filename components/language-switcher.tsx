@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { setLocale, getLocale, type Locale } from '@/lib/i18n';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function LanguageSwitcher() {
   const [currentLocale, setCurrentLocale] = useState<Locale>('en');
+  const { t } = useTranslation();
 
   useEffect(() => {
     setCurrentLocale(getLocale());
@@ -19,17 +21,18 @@ export function LanguageSwitcher() {
 
   return (
     <label className="relative inline-flex items-center text-sm text-muted-foreground">
-      <span className="sr-only">Select language</span>
+      <span className="sr-only">{t('common.selectLanguage')}</span>
       <div className="relative">
         <select
           value={currentLocale}
           onChange={(e) => handleLanguageChange(e.target.value as Locale)}
-          className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md py-2 pl-3 pr-9 text-sm font-medium text-gray-900 dark:text-gray-100 shadow-sm hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition"
+          className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md py-2 pl-3 pr-9 text-sm font-medium text-gray-900 dark:text-gray-100 shadow-sm hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition rtl-select"
         >
-          <option value="en">English</option>
-          <option value="fr">Français</option>
+          <option value="en">{t('common.english')}</option>
+          <option value="fr">{t('common.french')}</option>
+          <option value="ar">{t('common.arabic')}</option>
         </select>
-        <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-500">
+        <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-500 rtl-select-arrow">
           <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
             <path
               fillRule="evenodd"

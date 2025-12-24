@@ -4,39 +4,41 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function AuthErrorPage() {
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
+  const { t } = useTranslation();
 
   const getErrorMessage = (error: string | null) => {
     switch (error) {
       case 'Configuration':
-        return 'There is a problem with the server configuration.';
+        return t('auth.errorConfiguration');
       case 'AccessDenied':
-        return 'You do not have permission to sign in.';
+        return t('auth.errorAccessDenied');
       case 'Verification':
-        return 'The verification link may have expired or already been used.';
+        return t('auth.errorVerification');
       case 'OAuthSignin':
-        return 'Error in constructing an authorization URL.';
+        return t('auth.errorOAuthSignin');
       case 'OAuthCallback':
-        return 'Error in handling the response from an OAuth provider.';
+        return t('auth.errorOAuthCallback');
       case 'OAuthCreateAccount':
-        return 'Could not create OAuth provider user in the database.';
+        return t('auth.errorOAuthCreateAccount');
       case 'EmailCreateAccount':
-        return 'Could not create email provider user in the database.';
+        return t('auth.errorEmailCreateAccount');
       case 'Callback':
-        return 'Error in the OAuth callback handler route.';
+        return t('auth.errorCallback');
       case 'OAuthAccountNotLinked':
-        return 'Email on the account is already linked, but not with this OAuth account.';
+        return t('auth.errorOAuthAccountNotLinked');
       case 'EmailSignin':
-        return 'Sending the email with the verification link failed.';
+        return t('auth.errorEmailSignin');
       case 'CredentialsSignin':
-        return 'Sign in failed. Check the details you provided are correct.';
+        return t('auth.errorCredentialsSignin');
       case 'SessionRequired':
-        return 'Please sign in to access this page.';
+        return t('auth.errorSessionRequired');
       default:
-        return 'An unexpected error occurred. Please try again.';
+        return t('common.errorGeneric');
     }
   };
 
@@ -60,7 +62,7 @@ export default function AuthErrorPage() {
             </svg>
           </div>
           <CardTitle className="text-2xl font-bold text-center">
-            Authentication Error
+            {t('auth.errorTitle')}
           </CardTitle>
           <CardDescription className="text-center">
             {getErrorMessage(error)}
@@ -68,15 +70,15 @@ export default function AuthErrorPage() {
         </CardHeader>
         <CardContent className="text-center">
           <p className="text-sm text-muted-foreground">
-            If this problem persists, please contact support.
+            {t('auth.errorSupport')}
           </p>
         </CardContent>
         <CardFooter className="flex gap-4 justify-center">
           <Link href="/auth/login">
-            <Button>Try Again</Button>
+            <Button>{t('auth.tryAgain')}</Button>
           </Link>
           <Link href="/">
-            <Button variant="outline">Go Home</Button>
+            <Button variant="outline">{t('common.goHome')}</Button>
           </Link>
         </CardFooter>
       </Card>

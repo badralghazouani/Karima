@@ -7,9 +7,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -28,14 +30,14 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        setError(t('auth.invalidCredentials'));
       } else {
         // Redirect based on user role
         router.push('/dashboard/my-courses');
         router.refresh();
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError(t('common.errorGeneric'));
     } finally {
       setIsLoading(false);
     }
@@ -46,10 +48,10 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Welcome Back
+            {t('auth.welcomeBack')}
           </CardTitle>
           <CardDescription className="text-center">
-            Sign in to your account to continue learning
+            {t('auth.loginSubtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -62,12 +64,12 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
-                Email
+                {t('common.email')}
               </label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t('auth.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -78,13 +80,13 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label htmlFor="password" className="text-sm font-medium">
-                  Password
+                  {t('common.password')}
                 </label>
                 <Link
                   href="/auth/forgot-password"
                   className="text-sm text-primary hover:underline"
                 >
-                  Forgot password?
+                  {t('auth.forgotPasswordLink')}
                 </Link>
               </div>
               <Input
@@ -103,15 +105,15 @@ export default function LoginPage() {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? t('auth.signingIn') : t('common.login')}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center text-muted-foreground">
-            Don&apos;t have an account?{' '}
+            {t('auth.noAccount')}{' '}
             <Link href="/auth/signup" className="text-primary hover:underline">
-              Sign up
+              {t('common.signup')}
             </Link>
           </div>
         </CardFooter>

@@ -9,6 +9,7 @@ import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPrice, formatDuration } from '@/lib/utils';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Lesson {
   id: string;
@@ -50,6 +51,7 @@ export default function CourseDetailPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const courseId = params.id as string;
+  const { t } = useTranslation();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,11 +98,11 @@ export default function CourseDetailPage() {
         router.push(`/learn/${course?.id}`);
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to enroll');
+        alert(error.error || t('courses.enrollFailed'));
       }
     } catch (error) {
       console.error('Enrollment error:', error);
-      alert('Failed to enroll in course');
+      alert(t('courses.enrollFailedGeneric'));
     } finally {
       setIsEnrolling(false);
     }
@@ -120,7 +122,7 @@ export default function CourseDetailPage() {
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-1 flex items-center justify-center">
-          <p className="text-muted-foreground">Loading course...</p>
+          <p className="text-muted-foreground">{t('courses.loadingCourse')}</p>
         </main>
         <Footer />
       </div>
@@ -133,12 +135,12 @@ export default function CourseDetailPage() {
         <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">Course not found</h2>
+            <h2 className="text-2xl font-bold mb-2">{t('courses.notFoundTitle')}</h2>
             <p className="text-muted-foreground mb-6">
-              This course doesn't exist or is not published yet
+              {t('courses.notFoundSubtitle')}
             </p>
             <Link href="/courses">
-              <Button>Browse All Courses</Button>
+              <Button>{t('courses.browseAll')}</Button>
             </Link>
           </div>
         </main>
@@ -165,7 +167,7 @@ export default function CourseDetailPage() {
               <div className="flex flex-wrap items-center gap-4 mb-6">
                 {course.isFree && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                    FREE
+                    {t('courses.freeTag')}
                   </span>
                 )}
                 <div className="flex items-center gap-2 text-sm">
@@ -177,7 +179,7 @@ export default function CourseDetailPage() {
                       d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                     />
                   </svg>
-                  <span>Created by {course.instructor.name}</span>
+                  <span>{t('courses.createdBy', { name: course.instructor.name })}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +190,7 @@ export default function CourseDetailPage() {
                       d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
                     />
                   </svg>
-                  <span>{course._count.enrollments} students enrolled</span>
+                  <span>{t('courses.enrolledCount', { count: course._count.enrollments })}</span>
                 </div>
               </div>
 
@@ -199,14 +201,14 @@ export default function CourseDetailPage() {
                     <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z" />
                     </svg>
-                    Go to Course
+                    {t('courses.goToCourse')}
                   </Button>
                 </div>
               ) : (
                 <div className="flex items-center gap-4">
                   <div>
                     <div className="text-3xl font-bold mb-1">
-                      {course.isFree ? 'Free' : formatPrice(course.price)}
+                      {course.isFree ? t('courses.free') : formatPrice(course.price)}
                     </div>
                   </div>
                   {isFreeCourse ? (
@@ -215,14 +217,14 @@ export default function CourseDetailPage() {
                       onClick={handleEnroll}
                       disabled={isEnrolling}
                     >
-                      {isEnrolling ? 'Enrolling...' : 'Enroll for Free'}
+                      {isEnrolling ? t('courses.enrolling') : t('courses.enrollForFree')}
                     </Button>
                   ) : (
                     <Button
                       size="lg"
                       onClick={handleBuyCourse}
                     >
-                      Buy Course
+                      {t('courses.buyCourse')}
                     </Button>
                   )}
                 </div>
@@ -239,7 +241,7 @@ export default function CourseDetailPage() {
               {/* What You'll Learn */}
               <Card>
                 <CardHeader>
-                  <CardTitle>What you'll learn</CardTitle>
+                  <CardTitle>{t('courses.whatYouWillLearn')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">{course.description}</p>
@@ -249,9 +251,12 @@ export default function CourseDetailPage() {
               {/* Course Content / Curriculum */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Course Content</CardTitle>
+                  <CardTitle>{t('courses.courseContent')}</CardTitle>
                   <CardDescription>
-                    {course.lessons.length} lessons • {formatDuration(totalDuration)} total length
+                    {t('courses.lessonSummary', {
+                      count: course.lessons.length,
+                      duration: formatDuration(totalDuration),
+                    })}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -276,7 +281,7 @@ export default function CourseDetailPage() {
                         </div>
                         <div className="flex items-center gap-3">
                           {lesson.isFree && (
-                            <span className="text-xs font-medium text-green-600">Free Preview</span>
+                            <span className="text-xs font-medium text-green-600">{t('courses.freePreview')}</span>
                           )}
                           <span className="text-sm text-muted-foreground">
                             {formatDuration(lesson.duration)}
@@ -291,7 +296,7 @@ export default function CourseDetailPage() {
               {/* Instructor */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Instructor</CardTitle>
+                  <CardTitle>{t('courses.instructor')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-4">
@@ -310,7 +315,7 @@ export default function CourseDetailPage() {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold">{course.instructor.name}</h3>
-                      <p className="text-sm text-muted-foreground">Course Instructor</p>
+                      <p className="text-sm text-muted-foreground">{t('courses.courseInstructor')}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -321,33 +326,39 @@ export default function CourseDetailPage() {
             <div className="lg:col-span-1">
               <Card className="sticky top-4">
                 <CardHeader>
-                  <CardTitle>Course Details</CardTitle>
+                  <CardTitle>{t('courses.courseDetails')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Level:</span>
-                    <span className="font-medium">{course.level}</span>
+                    <span className="text-muted-foreground">{t('courses.level')}:</span>
+                    <span className="font-medium">{t(`courses.levelLabels.${course.level}`)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Duration:</span>
+                    <span className="text-muted-foreground">{t('courses.duration')}:</span>
                     <span className="font-medium">{formatDuration(totalDuration)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Lessons:</span>
+                    <span className="text-muted-foreground">{t('lessons.curriculum')}:</span>
                     <span className="font-medium">{course.lessons.length}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Language:</span>
-                    <span className="font-medium">{course.language === 'en' ? 'English' : 'French'}</span>
+                    <span className="text-muted-foreground">{t('courses.language')}:</span>
+                    <span className="font-medium">
+                      {course.language === 'en'
+                        ? t('common.english')
+                        : course.language === 'fr'
+                        ? t('common.french')
+                        : t('common.arabic')}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Enrolled:</span>
-                    <span className="font-medium">{course._count.enrollments} students</span>
+                    <span className="text-muted-foreground">{t('courses.enrolled')}:</span>
+                    <span className="font-medium">{t('courses.studentsCount', { count: course._count.enrollments })}</span>
                   </div>
 
                   <div className="pt-4 border-t">
                     <div className="text-2xl font-bold mb-4">
-                      {isFreeCourse ? 'Free' : formatPrice(course.price)}
+                      {isFreeCourse ? t('courses.free') : formatPrice(course.price)}
                     </div>
                     {course.isEnrolled || course.canAccess ? (
                       <Button
@@ -358,7 +369,7 @@ export default function CourseDetailPage() {
                         <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z" />
                         </svg>
-                        Start Learning
+                        {t('courses.startLearning')}
                       </Button>
                     ) : (
                       <>
@@ -369,7 +380,7 @@ export default function CourseDetailPage() {
                             onClick={handleEnroll}
                             disabled={isEnrolling}
                           >
-                            {isEnrolling ? 'Enrolling...' : 'Enroll for Free'}
+                            {isEnrolling ? t('courses.enrolling') : t('courses.enrollForFree')}
                           </Button>
                         ) : (
                           <Button
@@ -377,7 +388,7 @@ export default function CourseDetailPage() {
                             size="lg"
                             onClick={handleBuyCourse}
                           >
-                            Buy Now
+                            {t('courses.buyNow')}
                           </Button>
                         )}
                       </>

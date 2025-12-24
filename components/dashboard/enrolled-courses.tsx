@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface EnrolledCourse {
   id: string;
@@ -27,6 +28,7 @@ interface EnrolledCourse {
 }
 
 export function EnrolledCourses() {
+  const { t } = useTranslation();
   const [enrollments, setEnrollments] = useState<EnrolledCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -49,7 +51,7 @@ export function EnrolledCourses() {
   if (isLoading) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Loading courses...</p>
+        <p className="text-muted-foreground">{t('dashboard.loadingCourses')}</p>
       </div>
     );
   }
@@ -64,21 +66,21 @@ export function EnrolledCourses() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Enrolled Courses</CardDescription>
+            <CardDescription>{t('dashboard.enrolledCourses')}</CardDescription>
             <CardTitle className="text-3xl">{totalEnrolled}</CardTitle>
           </CardHeader>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>In Progress</CardDescription>
+            <CardDescription>{t('dashboard.inProgress')}</CardDescription>
             <CardTitle className="text-3xl">{inProgress}</CardTitle>
           </CardHeader>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardDescription>Completed</CardDescription>
+            <CardDescription>{t('dashboard.completed')}</CardDescription>
             <CardTitle className="text-3xl">{completed}</CardTitle>
           </CardHeader>
         </Card>
@@ -103,18 +105,18 @@ export function EnrolledCourses() {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold mb-2">No courses yet</h2>
+            <h2 className="text-xl font-semibold mb-2">{t('dashboard.noCoursesTitle')}</h2>
             <p className="text-muted-foreground mb-6">
-              Start learning by enrolling in your first course
+              {t('dashboard.noCoursesSubtitle')}
             </p>
             <Link href="/courses">
-              <Button>Browse Courses</Button>
+              <Button>{t('footer.browseCourses')}</Button>
             </Link>
           </div>
         </div>
       ) : (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">Continue Learning</h2>
+          <h2 className="text-2xl font-bold">{t('dashboard.continueLearning')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {enrollments.map((enrollment) => (
@@ -143,7 +145,7 @@ export function EnrolledCourses() {
                   </div>
                   <CardTitle className="line-clamp-2">{enrollment.course.title}</CardTitle>
                   <CardDescription className="line-clamp-2">
-                    by {enrollment.course.instructor.name}
+                    {t('dashboard.byInstructor', { name: enrollment.course.instructor.name })}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -151,7 +153,7 @@ export function EnrolledCourses() {
                     {/* Progress Bar */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Progress</span>
+                        <span className="text-sm font-medium">{t('dashboard.progress')}</span>
                         <span className="text-sm text-muted-foreground">
                           {enrollment.progress.percentage}%
                         </span>
@@ -163,22 +165,25 @@ export function EnrolledCourses() {
                         />
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        {enrollment.progress.completed} of {enrollment.progress.total} lessons
+                        {t('dashboard.lessonProgress', {
+                          completed: enrollment.progress.completed,
+                          total: enrollment.progress.total,
+                        })}
                       </div>
                     </div>
 
                     {/* Status Badge */}
                     {enrollment.completedAt ? (
                       <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        ✓ Completed
+                        {t('dashboard.statusCompleted')}
                       </div>
                     ) : enrollment.progress.completed > 0 ? (
                       <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        In Progress
+                        {t('dashboard.statusInProgress')}
                       </div>
                     ) : (
                       <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        Not Started
+                        {t('dashboard.statusNotStarted')}
                       </div>
                     )}
 
@@ -189,11 +194,11 @@ export function EnrolledCourses() {
                           <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z" />
                           </svg>
-                          Watch
+                          {t('dashboard.watch')}
                         </Button>
                       </Link>
                       <Link href={`/learn/${enrollment.course.slug}`}>
-                        <Button variant="outline" size="icon" title="Learning Mode">
+                        <Button variant="outline" size="icon" title={t('dashboard.learningMode')}>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                           </svg>
