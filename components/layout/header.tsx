@@ -17,7 +17,7 @@ export function Header() {
           {t('common.appName')}
         </Link>
 
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden md:flex items-center space-x-6 rtl-space-x">
           <Link href="/courses" className="hover:text-primary transition">
             {t('nav.courses')}
           </Link>
@@ -39,7 +39,7 @@ export function Header() {
           )}
         </nav>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 rtl-space-x">
           <LanguageSwitcher />
           {session?.user ? (
             <>
