@@ -7,7 +7,6 @@ import { getServerTranslator } from '@/lib/i18n-server';
 export default async function MyCoursesPage() {
   const user = await requireAuth();
   const { t } = getServerTranslator();
-  const userName = user.name ?? t('common.user');
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -17,7 +16,7 @@ export default async function MyCoursesPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">{t('dashboard.myCourses')}</h1>
           <p className="text-muted-foreground">
-            {t('dashboard.welcomeBack', { name: userName })}
+            {t('dashboard.welcomeBack', { name: user.name })}
           </p>
         </div>
 
